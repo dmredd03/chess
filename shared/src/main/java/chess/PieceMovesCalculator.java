@@ -19,6 +19,8 @@ public class PieceMovesCalculator {
         this.piece = board.getPiece(startPosition);
         if (piece.getPieceType() == ChessPiece.PieceType.BISHOP) {
             BishopMovesCalculator();
+        } else if (piece.getPieceType() == ChessPiece.PieceType.KNIGHT) {
+            KnightMovesCalculator();
         }
 
         return possibleMoves;
@@ -54,6 +56,41 @@ public class PieceMovesCalculator {
             currCol++;
         }
 
+    }
+
+    // Start Knight movement code
+    private void KnightMovesCalculator() {
+        int currRow = startPosition.getRow();
+        int currCol = startPosition.getColumn();
+
+        // test each direction
+
+        KnightTestMovablePosition(currRow + 2, currCol + 1); // up 2 right 1
+        KnightTestMovablePosition(currRow + 1, currCol + 2); // up 1 right 2
+        KnightTestMovablePosition(currRow - 1, currCol + 2); // down 1 right 2
+        KnightTestMovablePosition(currRow - 2, currCol + 1); // down 2 right 1
+        KnightTestMovablePosition(currRow - 2, currCol - 1); // down 2 left 1
+        KnightTestMovablePosition(currRow - 1, currCol - 2); // down 1 left 2
+        KnightTestMovablePosition(currRow + 1,  currCol - 2); // up 1 left 2
+        KnightTestMovablePosition(currRow + 2, currCol - 1); // up 2 left 1
+    }
+
+    private void KnightTestMovablePosition(int currRow, int currCol) {
+
+        if (currCol > 8 || currCol < 1 || currRow > 8 || currRow < 1) return;
+
+        ChessPosition currChessMovePosition = new ChessPosition(currRow, currCol);
+        ChessPiece chessPiece = board.getPiece(currChessMovePosition);
+
+        if (chessPiece == null) {
+            ChessMove newMove = new ChessMove(startPosition, currChessMovePosition, ChessPiece.PieceType.KNIGHT);
+            possibleMoves.add(newMove);
+        } else if (chessPiece.getTeamColor() != piece.getTeamColor()) {
+            ChessMove newMove = new ChessMove(startPosition, currChessMovePosition, ChessPiece.PieceType.KNIGHT);
+            possibleMoves.add(newMove);
+        } else {
+            // Your own piece is here, do not add possible move
+        }
     }
 
 
