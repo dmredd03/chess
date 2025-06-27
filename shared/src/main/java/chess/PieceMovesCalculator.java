@@ -25,6 +25,8 @@ public class PieceMovesCalculator {
             RookMovesCalculator();
         } else if (piece.getPieceType() == ChessPiece.PieceType.QUEEN) {
             QueenMovesCalculator();
+        } else if (piece.getPieceType() == ChessPiece.PieceType.KING) {
+            KingMovesCalculator();
         }
 
         return possibleMoves;
@@ -278,6 +280,39 @@ public class PieceMovesCalculator {
             possibleMoves.add(newMove);
         } else {
             // Your own piece is here, do not add possible move
+        }
+    }
+
+    // Start King movement code
+    private void KingMovesCalculator() {
+        int kingRow = startPosition.getRow();
+        int kingCol = startPosition.getColumn();
+        KingTestMovablePosition(kingRow + 1, kingCol); // up
+        KingTestMovablePosition(kingRow + 1, kingCol + 1); // up right
+        KingTestMovablePosition(kingRow, kingCol + 1); // right
+        KingTestMovablePosition(kingRow - 1, kingCol + 1); // down right
+        KingTestMovablePosition(kingRow - 1, kingCol); // down
+        KingTestMovablePosition(kingRow - 1, kingCol - 1); // down left
+        KingTestMovablePosition(kingRow, kingCol - 1); // left
+        KingTestMovablePosition(kingRow + 1, kingCol - 1); // up left
+    }
+
+    private void KingTestMovablePosition(int currRow, int currCol) {
+        if (currRow <= 8 && currRow >= 1 && currCol <= 8 && currCol >= 1) {
+            ChessPosition testPos = new ChessPosition(currRow, currCol);
+            ChessPiece currChessPiece = board.getPiece(testPos);
+            // open space
+            if (currChessPiece == null) {
+                ChessMove validMove = new ChessMove(startPosition, testPos, null);
+                possibleMoves.add(validMove);
+                // enemy space
+            } else if (currChessPiece.getTeamColor() != piece.getTeamColor()) {
+                ChessMove validMove = new ChessMove(startPosition, testPos, null);
+                possibleMoves.add(validMove);
+                // friendly (not valid space)
+            } else {
+                return;
+            }
         }
     }
 
