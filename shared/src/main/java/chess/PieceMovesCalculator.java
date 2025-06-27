@@ -23,6 +23,8 @@ public class PieceMovesCalculator {
             KnightMovesCalculator();
         } else if (piece.getPieceType() == ChessPiece.PieceType.ROOK) {
             RookMovesCalculator();
+        } else if (piece.getPieceType() == ChessPiece.PieceType.QUEEN) {
+            QueenMovesCalculator();
         }
 
         return possibleMoves;
@@ -236,6 +238,12 @@ public class PieceMovesCalculator {
             }
             currCol--;
         }
+    }
+
+    // Start Queen movement code
+    private void QueenMovesCalculator() {
+        BishopMovesCalculator();
+        RookMovesCalculator();
     }
 
     // Start Knight movement code
