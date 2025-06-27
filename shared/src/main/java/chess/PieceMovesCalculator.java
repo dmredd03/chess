@@ -33,27 +33,104 @@ public class PieceMovesCalculator {
         // up-right direction checks
         currRow++;
         currCol++;
-        while (currRow < 8 && currCol < 8) {
+        while (currRow <= 8 && currCol <= 8) {
 
             ChessPosition currChessMovePosition = new ChessPosition(currRow, currCol);
             ChessPiece chessPiece = board.getPiece(currChessMovePosition);
             // if empty
             if (chessPiece == null) {
-                ChessMove possibleMove = new ChessMove(startPosition, currChessMovePosition, ChessPiece.PieceType.BISHOP);
+                ChessMove possibleMove = new ChessMove(startPosition, currChessMovePosition, null);
                 possibleMoves.add(possibleMove);
                 // if enemy
             } else if (chessPiece.getTeamColor() != piece.getTeamColor()) {
-
-                ChessMove possibleMove = new ChessMove(startPosition, currChessMovePosition, ChessPiece.PieceType.BISHOP);
+                ChessMove possibleMove = new ChessMove(startPosition, currChessMovePosition, null);
                 possibleMoves.add(possibleMove);
                 break;
                 // if friendly piece
             } else if (chessPiece.getTeamColor() == piece.getTeamColor()) {
-
                 break;
             }
             currRow++;
             currCol++;
+        }
+
+        // down right direction
+        currRow = startPosition.getRow();
+        currCol = startPosition.getColumn();
+
+        currRow--;
+        currCol++;
+        while (currRow >= 1 && currCol <= 8) {
+
+            ChessPosition currChessMovePosition = new ChessPosition(currRow, currCol);
+            ChessPiece chessPiece = board.getPiece(currChessMovePosition);
+            // if empty
+            if (chessPiece == null) {
+                ChessMove possibleMove = new ChessMove(startPosition, currChessMovePosition, null);
+                possibleMoves.add(possibleMove);
+                // if enemy
+            } else if (chessPiece.getTeamColor() != piece.getTeamColor()) {
+                ChessMove possibleMove = new ChessMove(startPosition, currChessMovePosition, null);
+                possibleMoves.add(possibleMove);
+                break;
+                // if friendly piece
+            } else if (chessPiece.getTeamColor() == piece.getTeamColor()) {
+                break;
+            }
+            currRow--;
+            currCol++;
+        }
+        // down left
+        currRow = startPosition.getRow();
+        currCol = startPosition.getColumn();
+
+        currRow--;
+        currCol--;
+        while (currRow >= 1 && currCol >= 1) {
+
+            ChessPosition currChessMovePosition = new ChessPosition(currRow, currCol);
+            ChessPiece chessPiece = board.getPiece(currChessMovePosition);
+            // if empty
+            if (chessPiece == null) {
+                ChessMove possibleMove = new ChessMove(startPosition, currChessMovePosition, null);
+                possibleMoves.add(possibleMove);
+                // if enemy
+            } else if (chessPiece.getTeamColor() != piece.getTeamColor()) {
+                ChessMove possibleMove = new ChessMove(startPosition, currChessMovePosition, null);
+                possibleMoves.add(possibleMove);
+                break;
+                // if friendly piece
+            } else if (chessPiece.getTeamColor() == piece.getTeamColor()) {
+                break;
+            }
+            currRow--;
+            currCol--;
+        }
+        // up left
+        currRow = startPosition.getRow();
+        currCol = startPosition.getColumn();
+
+        currRow++;
+        currCol--;
+        while (currRow <= 8 && currCol >= 1) {
+
+            ChessPosition currChessMovePosition = new ChessPosition(currRow, currCol);
+            ChessPiece chessPiece = board.getPiece(currChessMovePosition);
+            // if empty
+            if (chessPiece == null) {
+                ChessMove possibleMove = new ChessMove(startPosition, currChessMovePosition, null);
+                possibleMoves.add(possibleMove);
+                // if enemy
+            } else if (chessPiece.getTeamColor() != piece.getTeamColor()) {
+                ChessMove possibleMove = new ChessMove(startPosition, currChessMovePosition, null);
+                possibleMoves.add(possibleMove);
+                break;
+                // if friendly piece
+            } else if (chessPiece.getTeamColor() == piece.getTeamColor()) {
+                break;
+            }
+            currRow++;
+            currCol--;
         }
 
     }
