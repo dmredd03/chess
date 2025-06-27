@@ -21,6 +21,8 @@ public class PieceMovesCalculator {
             BishopMovesCalculator();
         } else if (piece.getPieceType() == ChessPiece.PieceType.KNIGHT) {
             KnightMovesCalculator();
+        } else if (piece.getPieceType() == ChessPiece.PieceType.ROOK) {
+            RookMovesCalculator();
         }
 
         return possibleMoves;
@@ -132,7 +134,108 @@ public class PieceMovesCalculator {
             currRow++;
             currCol--;
         }
+    }
 
+    //Start Rook movement code
+    private void RookMovesCalculator() {
+        int currRow = startPosition.getRow();
+        int currCol = startPosition.getColumn();
+
+        // up
+
+        currRow++;
+        while(currRow <= 8) {
+            ChessPosition currChessPos = new ChessPosition(currRow, currCol);
+            ChessPiece chessPiece = board.getPiece(currChessPos);
+            // if empty
+            if (chessPiece == null) {
+                ChessMove validMove = new ChessMove(startPosition, currChessPos, null);
+                possibleMoves.add(validMove);
+                // if enemy piece
+            } else if (chessPiece.getTeamColor() != piece.getTeamColor()) {
+                ChessMove validMove = new ChessMove(startPosition, currChessPos, null);
+                possibleMoves.add(validMove);
+                break;
+                // if same piece
+            } else {
+                break;
+            }
+            currRow++;
+        }
+
+        // down
+        currRow = startPosition.getRow();
+        currCol = startPosition.getColumn();
+
+        currRow--;
+        while(currRow >= 1) {
+            ChessPosition currChessPos = new ChessPosition(currRow, currCol);
+            ChessPiece chessPiece = board.getPiece(currChessPos);
+            // if empty
+            if (chessPiece == null) {
+                ChessMove validMove = new ChessMove(startPosition, currChessPos, null);
+                possibleMoves.add(validMove);
+                // if enemy piece
+            } else if (chessPiece.getTeamColor() != piece.getTeamColor()) {
+                ChessMove validMove = new ChessMove(startPosition, currChessPos, null);
+                possibleMoves.add(validMove);
+                break;
+                // if same piece
+            } else {
+                break;
+            }
+            currRow--;
+        }
+
+        // right
+
+        currRow = startPosition.getRow();
+        currCol = startPosition.getColumn();
+
+        currCol++;
+        while(currCol <= 8) {
+            ChessPosition currChessPos = new ChessPosition(currRow, currCol);
+            ChessPiece chessPiece = board.getPiece(currChessPos);
+            // if empty
+            if (chessPiece == null) {
+                ChessMove validMove = new ChessMove(startPosition, currChessPos, null);
+                possibleMoves.add(validMove);
+                // if enemy piece
+            } else if (chessPiece.getTeamColor() != piece.getTeamColor()) {
+                ChessMove validMove = new ChessMove(startPosition, currChessPos, null);
+                possibleMoves.add(validMove);
+                break;
+                // if same piece
+            } else {
+                break;
+            }
+            currCol++;
+        }
+
+        // left
+
+        currRow = startPosition.getRow();
+        currCol = startPosition.getColumn();
+
+        currCol--;
+        while(currCol >= 1) {
+            ChessPosition currChessPos = new ChessPosition(currRow, currCol);
+            ChessPiece chessPiece = board.getPiece(currChessPos);
+            // if empty
+            if (chessPiece == null) {
+                ChessMove validMove = new ChessMove(startPosition, currChessPos, null);
+                possibleMoves.add(validMove);
+                // if enemy piece
+            } else if (chessPiece.getTeamColor() != piece.getTeamColor()) {
+                ChessMove validMove = new ChessMove(startPosition, currChessPos, null);
+                possibleMoves.add(validMove);
+                break;
+                // if same piece
+            } else {
+                break;
+            }
+            currCol--;
+        }
     }
 
     // Start Knight movement code
