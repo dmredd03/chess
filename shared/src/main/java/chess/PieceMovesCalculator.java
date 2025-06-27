@@ -83,10 +83,10 @@ public class PieceMovesCalculator {
         ChessPiece chessPiece = board.getPiece(currChessMovePosition);
 
         if (chessPiece == null) {
-            ChessMove newMove = new ChessMove(startPosition, currChessMovePosition, ChessPiece.PieceType.KNIGHT);
+            ChessMove newMove = new ChessMove(startPosition, currChessMovePosition, null);
             possibleMoves.add(newMove);
         } else if (chessPiece.getTeamColor() != piece.getTeamColor()) {
-            ChessMove newMove = new ChessMove(startPosition, currChessMovePosition, ChessPiece.PieceType.KNIGHT);
+            ChessMove newMove = new ChessMove(startPosition, currChessMovePosition, null);
             possibleMoves.add(newMove);
         } else {
             // Your own piece is here, do not add possible move
