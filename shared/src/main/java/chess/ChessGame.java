@@ -1,5 +1,6 @@
 package chess;
 
+import javax.management.InvalidAttributeValueException;
 import java.util.Collection;
 import java.util.Objects;
 
@@ -51,7 +52,24 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        // TODO: implement checking and stalemates
+        if (gameBoard.getPiece(startPosition) == null) return null;
+
+        Collection<ChessMove> possibleMoves = gameBoard.getPiece(startPosition).pieceMoves(gameBoard, startPosition);
+
+        // For each valid Move, test each possible board outcome
+        for (ChessMove move : possibleMoves) {
+            ChessGame possibleGameState = new ChessGame();
+            possibleGameState.setBoard(gameBoard);
+            possibleGameState.setTeamTurn(teamTurn);
+            try {
+                possibleGameState.makeMove(move);
+            } catch (InvalidMoveException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return possibleMoves;
     }
 
     /**
@@ -61,7 +79,10 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        ChessPiece pieceToMove = gameBoard.getPiece(move.getStartPosition());
+        if (pieceToMove == null) throw new InvalidMoveException();
+        gameBoard.addPiece(move.getStartPosition(), null);
+        gameBoard.addPiece(move.getEndPosition(), pieceToMove);
     }
 
     /**
@@ -81,7 +102,12 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        // TODO: FIX
+        boolean checkmate = false;
+        ChessPosition kingPos = getKingPosition(teamColor);
+        ChessPiece king = gameBoard.getPiece(kingPos);
+
+        return checkmate;
     }
 
     /**
@@ -113,6 +139,19 @@ public class ChessGame {
     public ChessBoard getBoard() {
 
         return gameBoard;
+    }
+
+    private ChessPosition getKingPosition(TeamColor team) {
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; i <= 8; i++) {
+                ChessPosition testPos = new ChessPosition(i, j);
+                ChessPiece testPiece = gameBoard.getPiece(testPos);
+                if (testPiece != null && testPiece.getPieceType() == ChessPiece.PieceType.KING) {
+                    return testPos;
+                }
+            }
+        }
+        return null;
     }
 
     @Override
