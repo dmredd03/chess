@@ -1,6 +1,7 @@
 package chess;
 
 import javax.management.InvalidAttributeValueException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 
@@ -65,7 +66,8 @@ public class ChessGame {
             try {
                 possibleGameState.makeMove(move);
             } catch (InvalidMoveException e) {
-                throw new RuntimeException(e);
+                // possibleMoves.remove(move);
+                toString();
             }
 
         }
@@ -152,13 +154,13 @@ public class ChessGame {
         ChessPiece king = gameBoard.getPiece(kingPos);
         Collection<ChessMove> kingMoves = king.pieceMoves(gameBoard, kingPos);
 
+        if (!inDanger(kingPos, teamColor)) return false;
+
         for (ChessMove possibleKingMove : kingMoves) {
-            if (!inDanger(possibleKingMove.getEndPosition(), teamColor)) checkmate = false;
-
+            if (!inDanger(possibleKingMove.getEndPosition(), teamColor)) return false;
         }
-        if (!inDanger(kingPos, teamColor)) checkmate = false;
 
-        return checkmate;
+        return true;
     }
 
     /**
@@ -213,7 +215,15 @@ public class ChessGame {
                 ChessPosition possiblePosition = new ChessPosition(i, j);
                 ChessPiece possiblePiece = gameBoard.getPiece(possiblePosition);
                 if (possiblePiece != null && possiblePiece.getTeamColor() != testTeamColor) {
+                    // adds all possible moves
                     Collection<ChessMove> possibleMoves = possiblePiece.pieceMoves(gameBoard, possiblePosition);
+                    // adds pawn attacks
+                    if (testTeamColor == TeamColor.WHITE) {
+                        possibleMoves.addAll(pawnAttackPrediction(TeamColor.BLACK));
+                    } else {
+                        possibleMoves.addAll(pawnAttackPrediction(TeamColor.WHITE));
+                    }
+
                     for (ChessMove testMove : possibleMoves) {
                         if (testMove.getEndPosition().equals(testPosition)) {
                             isInDanger = true;
@@ -222,8 +232,45 @@ public class ChessGame {
                 }
             }
         }
-
         return isInDanger;
+    }
+
+    private Collection<ChessMove> pawnAttackPrediction(TeamColor testTeamColor) {
+        Collection<ChessMove> pawnAttacks = new ArrayList<>();
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                ChessPosition testPos = new ChessPosition(i, j);
+                ChessPiece testPawn = gameBoard.getPiece(testPos);
+                if (testPawn != null && testPawn.getTeamColor() == testTeamColor && testPawn.getPieceType() == ChessPiece.PieceType.PAWN) {
+                    // Adds attack checks, doesn't worry about promotion or anything else, used to calculate danger for other pieces
+                    if (testPos.getColumn() > 1) {
+                        if (testTeamColor == TeamColor.WHITE) {
+                            ChessPosition leftAttackPos = new ChessPosition(testPos.getRow() + 1, testPos.getColumn() - 1);
+                            ChessMove leftAttack = new ChessMove(testPos, leftAttackPos, null);
+                            pawnAttacks.add(leftAttack);
+                        } else {
+                            ChessPosition leftAttackPos = new ChessPosition(testPos.getRow() - 1, testPos.getColumn() - 1);
+                            ChessMove leftAttack = new ChessMove(testPos, leftAttackPos, null);
+                            pawnAttacks.add(leftAttack);
+                        }
+                    }
+
+                    if (testPos.getColumn() < 8) {
+                        if (testTeamColor == TeamColor.WHITE) {
+                            ChessPosition rightAttackPos = new ChessPosition(testPos.getRow() + 1, testPos.getColumn() + 1);
+                            ChessMove rightAttack = new ChessMove(testPos, rightAttackPos, null);
+                            pawnAttacks.add(rightAttack);
+                        } else {
+                            ChessPosition rightAttackPos = new ChessPosition(testPos.getRow() - 1, testPos.getColumn() + 1);
+                            ChessMove rightAttack = new ChessMove(testPos, rightAttackPos, null);
+                            pawnAttacks.add(rightAttack);
+                        }
+                    }
+                }
+            }
+        }
+
+        return pawnAttacks;
     }
 
     @Override
