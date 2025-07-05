@@ -67,6 +67,7 @@ public class ChessGame {
             } catch (InvalidMoveException e) {
                 throw new RuntimeException(e);
             }
+
         }
 
         return possibleMoves;
@@ -83,6 +84,7 @@ public class ChessGame {
         if (pieceToMove == null) throw new InvalidMoveException();
         gameBoard.addPiece(move.getStartPosition(), null);
         gameBoard.addPiece(move.getEndPosition(), pieceToMove);
+        if (isInCheckmate(pieceToMove.pieceColor)) throw new InvalidMoveException();
     }
 
     /**
@@ -103,9 +105,16 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         // TODO: FIX
-        boolean checkmate = false;
+        boolean checkmate = true;
         ChessPosition kingPos = getKingPosition(teamColor);
         ChessPiece king = gameBoard.getPiece(kingPos);
+        Collection<ChessMove> kingMoves = king.pieceMoves(gameBoard, kingPos);
+
+        for (ChessMove possibleKingMove : kingMoves) {
+            if (!inDanger(possibleKingMove.getEndPosition(), teamColor)) checkmate = false;
+
+        }
+        if (!inDanger(kingPos, teamColor)) checkmate = false;
 
         return checkmate;
     }
@@ -143,15 +152,36 @@ public class ChessGame {
 
     private ChessPosition getKingPosition(TeamColor team) {
         for (int i = 1; i <= 8; i++) {
-            for (int j = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
                 ChessPosition testPos = new ChessPosition(i, j);
                 ChessPiece testPiece = gameBoard.getPiece(testPos);
-                if (testPiece != null && testPiece.getPieceType() == ChessPiece.PieceType.KING) {
+                if (testPiece != null && testPiece.getPieceType() == ChessPiece.PieceType.KING && testPiece.getTeamColor() == team) {
                     return testPos;
                 }
             }
         }
         return null;
+    }
+
+    private boolean inDanger(ChessPosition testPosition, TeamColor testTeamColor) {
+        boolean isInDanger = false;
+        // check every position for validMoves, if they have endPosition at testPosition, isInDanger
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                ChessPosition possiblePosition = new ChessPosition(i, j);
+                ChessPiece possiblePiece = gameBoard.getPiece(possiblePosition);
+                if (possiblePiece != null && possiblePiece.getTeamColor() != testTeamColor) {
+                    Collection<ChessMove> possibleMoves = possiblePiece.pieceMoves(gameBoard, possiblePosition);
+                    for (ChessMove move : possibleMoves) {
+                        if (move.getEndPosition() == testPosition) {
+                            isInDanger = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return isInDanger;
     }
 
     @Override
