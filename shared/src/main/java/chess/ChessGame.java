@@ -225,25 +225,31 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        // TODO: Come back to implement isInStalemate after validMove is implemented
         ChessPosition kingPos = getKingPosition(teamColor);
-        ChessPiece king = gameBoard.getPiece(kingPos);
-        Collection<ChessMove> kingMoves = king.pieceMoves(gameBoard, kingPos);
 
         // test if king is movable
-        for (ChessMove possibleKingMove : kingMoves) {
-            if (inDanger(possibleKingMove.getEndPosition(), teamColor)) {
-                continue;
-            } else {
-                return false;
+        if (!validMoves(kingPos).isEmpty()) {
+            return false;
+        }
+        // test if king is in check
+        if (isInCheck(teamColor)) {
+            return false;
+        }
+        // test if there are any validMoves available, if not then stalemate is true
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                ChessPosition testPos = new ChessPosition(i, j);
+                ChessPiece testPiece = gameBoard.getPiece(testPos);
+                // if friendly piece, check for valid moves. If they exist, no stalemate
+                if (testPiece != null && testPiece.getTeamColor() == teamColor) {
+                    if (!validMoves(testPos).isEmpty()) {
+                        return false;
+                    }
+                }
             }
         }
-
-        if (inDanger(kingPos, teamColor)) {
-            return false;
-        } else {
-            return true;
-        }
+        // all tests fail, then it is stalemate
+        return true;
     }
 
     /**
