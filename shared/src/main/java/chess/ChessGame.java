@@ -116,8 +116,6 @@ public class ChessGame {
 
         // after movement checks
         if (isInCheck(pieceToMove.pieceColor)) throw new InvalidMoveException();
-        if (isInCheckmate(pieceToMove.pieceColor)) throw new InvalidMoveException();
-        // check check here
         // stalemate check here
         if (pieceToMove.getTeamColor() == TeamColor.WHITE) {
             teamTurn = TeamColor.BLACK;
@@ -153,11 +151,48 @@ public class ChessGame {
         ChessPiece king = gameBoard.getPiece(kingPos);
         Collection<ChessMove> kingMoves = king.pieceMoves(gameBoard, kingPos);
 
-        if (!inDanger(kingPos, teamColor)) return false;
+        // if not in check, not in checkmate
+        if (!isInCheck(teamColor)) return false;
 
-        for (ChessMove possibleKingMove : kingMoves) {
-            if (!inDanger(possibleKingMove.getEndPosition(), teamColor)) return false;
+        // check if any movement taken could get king out of check
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                ChessPosition testPos = new ChessPosition(i, j);
+                ChessPiece testPiece = gameBoard.getPiece(testPos);
+                // if a piece is on my team, test where I can move it and if that move gets the king to safety
+                if (testPiece != null && testPiece.getTeamColor() == teamColor) {
+                    Collection<ChessMove> possibleMoves = testPiece.pieceMoves(gameBoard, testPos);
+                    for (ChessMove move : possibleMoves) {
+                        ChessBoard currentBoard = getBoard();
+
+                        try {
+                            makeMove(move);
+                            if (isInCheck(teamColor)) {
+                                setBoard(currentBoard);
+                                return false;
+                            }
+                        } catch (InvalidMoveException e){
+                            setBoard(currentBoard);
+                        }
+                        // if king is out of check, not in checkmate
+
+                    }
+                }
+            }
         }
+
+
+        // check if moving the king gets him out of check
+        /*for (ChessMove possibleKingMove : kingMoves) {
+            // if (!inDanger(possibleKingMove.getEndPosition(), teamColor)) return false;
+
+            ChessGame kingScenario = new ChessGame();
+            kingScenario.setBoard(gameBoard);
+            kingScenario.setTeamTurn(teamColor);
+            kingScenario.getBoard().addPiece(kingPos, null);
+            kingScenario.getBoard().addPiece(possibleKingMove.getEndPosition(), new ChessPiece(teamColor, ChessPiece.PieceType.KING));
+            if (!kingScenario.inDanger(possibleKingMove.getEndPosition(), teamColor)) return false;
+        }*/
 
         return true;
     }
@@ -310,4 +345,6 @@ public class ChessGame {
                 ", teamTurn=" + teamTurn +
                 '}';
     }
+
+
 }
