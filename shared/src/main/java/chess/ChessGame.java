@@ -16,6 +16,7 @@ public class ChessGame {
     private TeamColor teamTurn;
     public ChessGame() {
         this.gameBoard = new ChessBoard();
+        gameBoard.resetBoard();
         this.teamTurn = TeamColor.WHITE;
     }
 
@@ -187,23 +188,13 @@ public class ChessGame {
             }
         }
 
-        // check if moving the king gets him out of check
-        /*for (ChessMove possibleKingMove : kingMoves) {
-            // if (!inDanger(possibleKingMove.getEndPosition(), teamColor)) return false;
-
-            ChessGame kingScenario = new ChessGame();
-            kingScenario.setBoard(gameBoard);
-            kingScenario.setTeamTurn(teamColor);
-            kingScenario.getBoard().addPiece(kingPos, null);
-            kingScenario.getBoard().addPiece(possibleKingMove.getEndPosition(), new ChessPiece(teamColor, ChessPiece.PieceType.KING));
-            if (!kingScenario.inDanger(possibleKingMove.getEndPosition(), teamColor)) return false;
-        }*/
 
         return true;
     }
 
     public ChessGame copy() {
         ChessGame copy = new ChessGame();
+        copy.getBoard().clearBoard();
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
                 ChessPiece testPiece = gameBoard.getPiece(new ChessPosition(i, j));
@@ -365,12 +356,5 @@ public class ChessGame {
         return Objects.hash(gameBoard, teamTurn);
     }
 
-    @Override
-    public String toString() {
-        return "ChessGame{" +
-                "gameBoard=" + gameBoard +
-                ", teamTurn=" + teamTurn +
-                '}';
-    }
 
 }
