@@ -57,21 +57,29 @@ public class ChessGame {
         if (gameBoard.getPiece(startPosition) == null) return null;
 
         Collection<ChessMove> possibleMoves = gameBoard.getPiece(startPosition).pieceMoves(gameBoard, startPosition);
+        Collection<ChessMove> badMoves = new ArrayList<>();
 
         // For each valid Move, test each possible board outcome
         for (ChessMove move : possibleMoves) {
-            ChessGame possibleGameState = new ChessGame();
-            possibleGameState.setBoard(gameBoard);
-            possibleGameState.setTeamTurn(teamTurn);
+            ChessGame possibleGameState = copy();
+
             try {
                 possibleGameState.makeMove(move);
             } catch (InvalidMoveException e) {
-                // possibleMoves.remove(move);
-                toString();
+                try {
+                    if (possibleGameState.teamTurn == TeamColor.WHITE) {
+                        possibleGameState.setTeamTurn(TeamColor.BLACK);
+                    } else {
+                        possibleGameState.setTeamTurn(TeamColor.WHITE);
+                    }
+                    possibleGameState.makeMove(move);
+                } catch (InvalidMoveException f) {
+                    badMoves.add(move);
+                }
             }
 
         }
-
+        possibleMoves.removeAll(badMoves);
         return possibleMoves;
     }
 
