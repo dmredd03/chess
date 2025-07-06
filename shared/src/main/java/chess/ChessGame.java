@@ -163,16 +163,14 @@ public class ChessGame {
                 if (testPiece != null && testPiece.getTeamColor() == teamColor) {
                     Collection<ChessMove> possibleMoves = testPiece.pieceMoves(gameBoard, testPos);
                     for (ChessMove move : possibleMoves) {
-                        ChessBoard currentBoard = getBoard();
+                        ChessGame currentGameState = copy();
 
                         try {
-                            makeMove(move);
-                            if (isInCheck(teamColor)) {
-                                setBoard(currentBoard);
-                                return false;
-                            }
+                            currentGameState.makeMove(move);
+                            if (isInCheck(teamColor)) return false;
+
                         } catch (InvalidMoveException e){
-                            setBoard(currentBoard);
+                            ;
                         }
                         // if king is out of check, not in checkmate
 
@@ -180,7 +178,6 @@ public class ChessGame {
                 }
             }
         }
-
 
         // check if moving the king gets him out of check
         /*for (ChessMove possibleKingMove : kingMoves) {
@@ -197,6 +194,21 @@ public class ChessGame {
         return true;
     }
 
+    public ChessGame copy() {
+        ChessGame copy = new ChessGame();
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                ChessPiece testPiece = gameBoard.getPiece(new ChessPosition(i, j));
+                if (testPiece != null) {
+                    ChessPiece copyPiece = new ChessPiece(testPiece);
+                    copy.gameBoard.addPiece(new ChessPosition(i, j), copyPiece);
+                }
+            }
+        }
+        copy.teamTurn = this.teamTurn;
+        return copy;
+    }
+
     /**
      * Determines if the given team is in stalemate, which here is defined as having
      * no valid moves while not in check.
@@ -210,6 +222,7 @@ public class ChessGame {
         ChessPiece king = gameBoard.getPiece(kingPos);
         Collection<ChessMove> kingMoves = king.pieceMoves(gameBoard, kingPos);
 
+        // test if king is movable
         for (ChessMove possibleKingMove : kingMoves) {
             if (inDanger(possibleKingMove.getEndPosition(), teamColor)) {
                 continue;
@@ -345,6 +358,5 @@ public class ChessGame {
                 ", teamTurn=" + teamTurn +
                 '}';
     }
-
 
 }
