@@ -12,7 +12,7 @@ class handler implements Route {
 
     public Object handle(Request req, Response res) {
         if (req.pathInfo().equals("/user")) {
-            RegisterHandler(req, res);
+            // RegisterHandler(req, res);
         } else {
 
         }
@@ -20,7 +20,7 @@ class handler implements Route {
         return res;
     }
 
-    private Object RegisterHandler(Request req, Response res) {
+/*    private Object RegisterHandler(Request req, Response res) {
         // deserialize JSON request body to Java request object
         RegisterRequest registerRequest = new RegisterRequest();
         registerRequest.fromJSON(req);
@@ -34,7 +34,7 @@ class handler implements Route {
 
         //Send HTTP response back to client with status code and response body
         return serializer.toJson(); // Change later to RegisterResult
-    }
+    }*/
 
 }
 
@@ -53,5 +53,6 @@ class RegisterRequest {
 
     private Response toJSON(ArrayList<String> objData) {
         // IMPLEMENT
+        return null;
     }
 }
