@@ -6,9 +6,11 @@ import java.util.UUID;
 
 public class MemoryAuthDAO implements AuthDAO {
     private ArrayList<model.AuthData> authDb = new ArrayList<>();
-    public void createAuth(String username) {
+    public String createAuth(String username) {
         String newToken = generateToken();
         model.AuthData newAuth = new model.AuthData(newToken, username);
+        authDb.add(newAuth);
+        return newToken;
     }
 
     public model.AuthData getAuth(String authToken) throws DataAccessException {

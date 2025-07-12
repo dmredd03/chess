@@ -1,4 +1,7 @@
 package service;
+import dataaccess.DataAccessException;
+import dataaccess.MemoryAuthDAO;
+import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryUserDAO;
 
 import model.model;
@@ -8,8 +11,30 @@ import spark.Response;
 
 
 public class UserService {
+    private MemoryUserDAO userDAO;
+    private MemoryAuthDAO authDAO;
+    private MemoryGameDAO gameDAO;
+
+    public UserService(MemoryUserDAO userDAO, MemoryAuthDAO authDAO, MemoryGameDAO gameDAO) {
+        this.userDAO = userDAO;
+        this.authDAO = authDAO;
+        this.gameDAO = gameDAO;
+    }
+
     public model.RegisterResult register(model.RegisterRequest registerRequest) {
-        MemoryUserDAO.
+        try {
+            model.UserData newUser = userDAO.getUser(registerRequest.username());
+            if (newUser == null) {
+                // person doesn't exist, continue
+            } else {
+                // throw an error
+            }
+        } catch (DataAccessException x) {
+            // TODO: add already taken error
+        }
+        userDAO.createUser(new model.UserData(registerRequest.username(), registerRequest.password(), registerRequest.email()));
+        String authKey = authDAO.createAuth(registerRequest.username());
+        return new model.RegisterResult(registerRequest.username(), authKey);
     }
 }
 

@@ -1,5 +1,8 @@
 package handler;
 
+import dataaccess.MemoryAuthDAO;
+import dataaccess.MemoryGameDAO;
+import dataaccess.MemoryUserDAO;
 import model.model;
 import spark.Route;
 import spark.Request;
@@ -7,13 +10,21 @@ import spark.Response;
 import com.google.gson.Gson;
 import service.UserService;
 
-import java.util.ArrayList;
+public class HandlerLogic implements Route {
+    private MemoryUserDAO userDAO;
+    private MemoryAuthDAO authDAO;
+    private MemoryGameDAO gameDAO;
 
-class handler implements Route {
+    public HandlerLogic(MemoryUserDAO userDAO, MemoryAuthDAO authDAO, MemoryGameDAO gameDAO) {
+        this.userDAO = userDAO;
+        this.authDAO = authDAO;
+        this.gameDAO = gameDAO;
+    }
+
 
     public Object handle(Request req, Response res) {
         if (req.pathInfo().equals("/user")) {
-            // RegisterHandler(req, res);
+            RegisterHandler(req, res);
         } else {
 
         }
@@ -27,7 +38,7 @@ class handler implements Route {
         model.RegisterRequest myRequest = serializer.fromJson(req.body(), model.RegisterRequest.class);
 
         // Call service.service class to perform the requested function, passing it the request
-        UserService service = new UserService();
+        UserService service = new UserService(userDAO, authDAO, gameDAO);
         // Receive java response object from service.service
         model.RegisterResult registerResult = service.register(myRequest);
         // Serialize Java response object to JSON
