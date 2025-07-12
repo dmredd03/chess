@@ -10,4 +10,6 @@ public class model {
     // Register records
     public record RegisterResult(String username, String authToken) {} // TODO: remove
     public record RegisterRequest(String username, String password, String email) {}
+
+    public record errorMessage(String message) {}
 }

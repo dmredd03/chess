@@ -1,5 +1,6 @@
 package handler;
 
+import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryUserDAO;
@@ -9,6 +10,8 @@ import spark.Request;
 import spark.Response;
 import com.google.gson.Gson;
 import service.UserService;
+
+import java.util.Map;
 
 public class HandlerLogic implements Route {
     private MemoryUserDAO userDAO;
@@ -23,46 +26,37 @@ public class HandlerLogic implements Route {
 
 
     public Object handle(Request req, Response res) {
+        Object newRes;
         if (req.pathInfo().equals("/user")) {
-            RegisterHandler(req, res);
+            newRes = RegisterHandler(req, res);
         } else {
-
+            newRes = null;
         }
 
-        return res;
+        return newRes;
     }
 
     private Object RegisterHandler(Request req, Response res) {
         // deserialize JSON request body to Java request object
         var serializer = new Gson();
-        model.RegisterRequest myRequest = serializer.fromJson(req.body(), model.RegisterRequest.class);
+        try {
+            model.RegisterRequest myRequest = serializer.fromJson(req.body(), model.RegisterRequest.class);
 
-        // Call service.service class to perform the requested function, passing it the request
-        UserService service = new UserService(userDAO, authDAO, gameDAO);
-        // Receive java response object from service.service
-        model.RegisterResult registerResult = service.register(myRequest);
-        // Serialize Java response object to JSON
-        //Send HTTP response back to client with status code and response body
-        return serializer.toJson(registerResult);
+            // Call service.service class to perform the requested function, passing it the request
+            UserService service = new UserService(userDAO, authDAO, gameDAO);
+            // Receive java response object from service.service
+            model.RegisterResult registerResult = service.register(myRequest);
+            // Serialize Java response object to JSON
+            //Send HTTP response back to client with status code and response body
+            return serializer.toJson(registerResult);
+        } catch (DataAccessException e) {
+            res.status(401);
+            return serializer.toJson(Map.of("message", "Error: unauthorized"));
+        } catch (Exception e) {
+            res.status(500);
+            res.body("error");
+            return serializer.toJson(Map.of("message", "Error: (" + e.getMessage() + ")"));
+        }
     }
 
 }
-
-
-
-/*class RegisterRequest {
-    private RegisterRequest regReq;
-    public void fromJSON(Request reqData) {
-        var deserializer = new Gson();
-        regReq = deserializer.fromJson(reqData.body(), RegisterRequest.class);
-    }
-
-    public RegisterRequest getRequest() {
-        return regReq;
-    }
-
-    private Response toJSON(ArrayList<String> objData) {
-        // IMPLEMENT
-        return null;
-    }
-}*/
