@@ -1,0 +1,36 @@
+package dataaccess;
+import model.model;
+
+import java.util.ArrayList;
+import java.util.UUID;
+
+public class MemoryAuthDAO implements AuthDAO {
+    private ArrayList<model.AuthData> authDb = new ArrayList<>();
+    public void createAuth(String username) {
+        String newToken = generateToken();
+        model.AuthData newAuth = new model.AuthData(newToken, username);
+    }
+
+    public model.AuthData getAuth(String authToken) throws DataAccessException {
+        for ( model.AuthData currAuthData : authDb ) {
+            if (currAuthData.authToken().equals(authToken)) {
+                return currAuthData;
+            }
+        }
+        throw new DataAccessException("authorization not found");
+    }
+
+    public void deleteAuth(String authToken) throws DataAccessException {
+        for ( model.AuthData currAuthData : authDb ) {
+            if (currAuthData.authToken().equals(authToken)) {
+                authDb.remove(currAuthData);
+            }
+        }
+        throw new DataAccessException("authorization not found");
+    }
+
+    private static String generateToken() {
+        return UUID.randomUUID().toString();
+    }
+
+}

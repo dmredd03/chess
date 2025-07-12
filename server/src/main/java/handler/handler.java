@@ -1,12 +1,13 @@
-import com.google.gson.GsonBuilder;
-import spark.Spark;
+package handler;
+
+import model.model;
 import spark.Route;
 import spark.Request;
 import spark.Response;
 import com.google.gson.Gson;
+import service.UserService;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 class handler implements Route {
 
@@ -20,27 +21,25 @@ class handler implements Route {
         return res;
     }
 
-/*    private Object RegisterHandler(Request req, Response res) {
+    private Object RegisterHandler(Request req, Response res) {
         // deserialize JSON request body to Java request object
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.fromJSON(req);
+        var serializer = new Gson();
+        model.RegisterRequest myRequest = serializer.fromJson(req.body(), model.RegisterRequest.class);
 
-        // Call service class to perform the requested function, passing it the request
-        RegisterService service = new RegisterService();
-        service.register(registerRequest.getRequest());
-        // Receive java response object from service
-
+        // Call service.service class to perform the requested function, passing it the request
+        UserService service = new UserService();
+        // Receive java response object from service.service
+        model.RegisterResult registerResult = service.register(myRequest);
         // Serialize Java response object to JSON
-
         //Send HTTP response back to client with status code and response body
-        return serializer.toJson(); // Change later to RegisterResult
-    }*/
+        return serializer.toJson(registerResult);
+    }
 
 }
 
 
 
-class RegisterRequest {
+/*class RegisterRequest {
     private RegisterRequest regReq;
     public void fromJSON(Request reqData) {
         var deserializer = new Gson();
@@ -55,4 +54,4 @@ class RegisterRequest {
         // IMPLEMENT
         return null;
     }
-}
+}*/
