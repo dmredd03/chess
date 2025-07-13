@@ -18,4 +18,8 @@ public class MemoryUserDAO implements UserDAO {
     public void createUser(model.UserData newUser) {
         UserDb.add(newUser);
     }
+
+    public void clearUserDAO() {
+        if (!UserDb.isEmpty()) UserDb.clear();
+    }
 }

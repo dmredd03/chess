@@ -31,8 +31,14 @@ public class MemoryAuthDAO implements AuthDAO {
         throw new DataAccessException("authorization not found");
     }
 
+    public void clearAuthDAO() {
+        if (!authDb.isEmpty()) authDb.clear();
+    }
+
     private static String generateToken() {
         return UUID.randomUUID().toString();
     }
+
+
 
 }

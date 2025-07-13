@@ -9,4 +9,5 @@ public interface GameDAO {
     model.GameData getGame(int gameID);
     ArrayList<model.GameData> listGame();
     void updateGame(model.GameData newGameState);
+    void clearGameDAO();
 }

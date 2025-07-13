@@ -44,4 +44,8 @@ public class MemoryGameDAO implements GameDAO {
         }
     }
 
+    public void clearGameDAO() {
+        if (!gameDb.isEmpty()) gameDb.clear();
+    }
+
 }

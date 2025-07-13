@@ -6,6 +6,7 @@ import dataaccess.MemoryUserDAO;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
 import service.UserService;
+import service.ClearService;
 
 public class service {
     @Test
@@ -40,6 +41,22 @@ public class service {
             userService.register(req);
         });
 
+    }
+
+    // User is added and then deleted, checks to make sure userDb is empty
+    @Test
+    public void clearPositive() throws Exception {
+        MemoryUserDAO userDAO = new MemoryUserDAO();
+        MemoryAuthDAO authDAO = new MemoryAuthDAO();
+        MemoryGameDAO gameDAO = new MemoryGameDAO();
+        UserService userService = new UserService(userDAO, authDAO, gameDAO);
+        ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
+        model.RegisterRequest req = new model.RegisterRequest("david", "12345", "david@email.com");
+        userService.register(req);
+        clearService.clear();
+
+
+        assertNull(userDAO.getUser("david"));
     }
 
 

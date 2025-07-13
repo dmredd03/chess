@@ -11,5 +11,9 @@ public class model {
     public record RegisterResult(String username, String authToken) {} // TODO: remove
     public record RegisterRequest(String username, String password, String email) {}
 
+    // Clear records
+    public record ClearResult() {}
+    public record ClearRequest() {}
+
     public record errorMessage(String message) {}
 }
