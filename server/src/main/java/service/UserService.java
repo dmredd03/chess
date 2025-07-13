@@ -35,5 +35,19 @@ public class UserService {
         String authKey = authDAO.createAuth(registerRequest.username());
         return new model.RegisterResult(registerRequest.username(), authKey);
     }
+
+    public model.LoginResult login(model.LoginRequest loginRequest) throws DataAccessException {
+        model.UserData inputtedData = new model.UserData(loginRequest.username(), loginRequest.password(), null);
+        model.UserData loginUser = userDAO.getUser(loginRequest.username());
+        if (loginUser == null) {
+            throw new DataAccessException("unauthorized");
+        }
+        // Check if password is correct
+        if (!userDAO.matchingPassword(inputtedData)) throw new DataAccessException("unauthorized");
+
+        String myAuthToken = authDAO.createAuth(loginRequest.username());
+
+        return new model.LoginResult(loginUser.username(), myAuthToken);
+    }
 }
 

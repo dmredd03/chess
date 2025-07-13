@@ -19,6 +19,16 @@ public class MemoryUserDAO implements UserDAO {
         UserDb.add(newUser);
     }
 
+    public Boolean matchingPassword(model.UserData user) {
+        if (UserDb.isEmpty()) return false;
+        for (model.UserData testUser : UserDb) {
+            if (testUser.password().equals(user.password()) && testUser.username().equals(user.username())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void clearUserDAO() {
         if (!UserDb.isEmpty()) UserDb.clear();
     }

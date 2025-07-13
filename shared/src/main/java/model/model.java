@@ -8,12 +8,16 @@ public class model {
     public record AuthData(String authToken, String username) {}
 
     // Register records
-    public record RegisterResult(String username, String authToken) {} // TODO: remove
     public record RegisterRequest(String username, String password, String email) {}
+    public record RegisterResult(String username, String authToken) {}
+
+    // Login records
+    public record LoginRequest(String username, String password) {}
+    public record LoginResult(String username, String authToken) {}
 
     // Clear records
-    public record ClearResult() {}
     public record ClearRequest() {}
+    public record ClearResult() {}
 
     public record errorMessage(String message) {}
 }

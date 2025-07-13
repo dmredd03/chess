@@ -37,8 +37,9 @@ public class Server {
     }
 
     private void createRoutes() {
-        Spark.post("/user", new handler.HandlerLogic(userDAO, authDAO, gameDAO));
-        Spark.delete("/db", new handler.HandlerLogic(userDAO, authDAO, gameDAO));
+        Spark.post("/user", new HandlerLogic(userDAO, authDAO, gameDAO));
+        Spark.post("/session", new HandlerLogic(userDAO, authDAO, gameDAO));
+        Spark.delete("/db", new HandlerLogic(userDAO, authDAO, gameDAO));
     }
 
 }

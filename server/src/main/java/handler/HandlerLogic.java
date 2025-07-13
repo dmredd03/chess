@@ -33,6 +33,8 @@ public class HandlerLogic implements Route {
             newRes = RegisterHandler(req, res);
         } else if (req.pathInfo().equals("/db")) {
             newRes = ClearHandler(req, res);
+        } else if (req.pathInfo().equals("/session") && "POST".equals(req.requestMethod())) {
+            newRes = LoginHandler(req, res);
         } else {
             newRes = null;
         }
@@ -66,6 +68,26 @@ public class HandlerLogic implements Route {
         }
     }
 
+    private Object LoginHandler(Request req, Response res) {
+        var serializer = new Gson();
+        try {
+            model.LoginRequest myLoginRequest = serializer.fromJson(req.body(), model.LoginRequest.class);
+            BadRequestLogin(serializer, myLoginRequest);
+            UserService service = new UserService(userDAO, authDAO, gameDAO);
+            model.LoginResult myLoginResult = service.login(myLoginRequest);
+            return serializer.toJson(myLoginResult);
+        } catch (BadRequest e) {
+            res.status(400);
+            return serializer.toJson(Map.of("message", "Error: bad request"));
+        } catch (DataAccessException e) {
+            res.status(401);
+            return serializer.toJson(Map.of("message", "Error: unauthorized"));
+        } catch (Exception e) {
+            res.status(500);
+            return serializer.toJson(Map.of("message", "Error: (" + e.getMessage() + ")"));
+        }
+    }
+
     private Object ClearHandler(Request req, Response res) {
         var serializer = new Gson();
         try {
@@ -82,8 +104,16 @@ public class HandlerLogic implements Route {
     private void BadRequestRegister(Gson gson, model.RegisterRequest registerRequest) throws BadRequest {
         if (registerRequest == null ||
         registerRequest.username() == null || registerRequest.username().isBlank() ||
-        registerRequest.password() == null || registerRequest.username().isBlank() ||
+        registerRequest.password() == null || registerRequest.password().isBlank() ||
         registerRequest.email() == null || registerRequest.email().isBlank()) {
+            throw new BadRequest("Error: bad request");
+        }
+    }
+
+    private void BadRequestLogin(Gson gson, model.LoginRequest loginRequest) throws BadRequest {
+        if (loginRequest == null ||
+                loginRequest.username() == null || loginRequest.username().isBlank() ||
+                loginRequest.password() == null || loginRequest.password().isBlank()) {
             throw new BadRequest("Error: bad request");
         }
     }
