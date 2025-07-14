@@ -5,14 +5,11 @@ import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryUserDAO;
 import model.model;
-import service.BadRequest;
-import service.ClearService;
-import service.GameService;
+import service.*;
 import spark.Route;
 import spark.Request;
 import spark.Response;
 import com.google.gson.Gson;
-import service.UserService;
 
 import java.util.Map;
 
@@ -42,6 +39,8 @@ public class HandlerLogic implements Route {
             newRes = ListGamesHandler(req, res);
         } else if (req.pathInfo().equals("/game") && "POST".equals(req.requestMethod())){
             newRes = CreateGameHandler(req, res);
+        } else if (req.pathInfo().equals("/game") && "PUT".equals(req.requestMethod())) {
+            newRes = JoinGameHandler(req, res);
         } else {
             newRes = false;
         }
@@ -148,6 +147,31 @@ public class HandlerLogic implements Route {
         }
     }
 
+    private Object JoinGameHandler(Request req, Response res) {
+        var serializer = new Gson();
+        try {
+            model.JoinGameRequest myJoinRequest = serializer.fromJson(req.body(), model.JoinGameRequest.class);
+            BadRequestJoinGame(myJoinRequest);
+            String authorization = req.headers("authorization");
+            GameService service = new GameService(userDAO, authDAO, gameDAO);
+            model.JoinGameResult joinResult = service.joinGame(myJoinRequest, authorization);
+            res.status(200);
+            return serializer.toJson(joinResult);
+        } catch (BadRequest e) {
+            res.status(400);
+            return serializer.toJson(Map.of("message", "Error: bad request"));
+        } catch (DataAccessException e) {
+            res.status(401);
+            return serializer.toJson(Map.of("message", "Error: unauthorized"));
+        } catch (AlreadyTaken e) {
+            res.status(403);
+            return serializer.toJson(Map.of("message", "Error: already taken"));
+        } catch (Exception e) {
+            res.status(500);
+            return serializer.toJson(Map.of("message", "Error: already taken"));
+        }
+    }
+
     private Object ClearHandler(Request req, Response res) {
         var serializer = new Gson();
         try {
@@ -180,6 +204,11 @@ public class HandlerLogic implements Route {
 
     private void BadRequestCreateGame(model.CreateGameRequest createGameRequest) throws BadRequest {
         if (createGameRequest.gameName() == null || createGameRequest.gameName().isBlank()) throw new BadRequest("Error: bad request");
+    }
+
+    private void BadRequestJoinGame(model.JoinGameRequest request) throws BadRequest {
+        if (request.playerColor() == null || (!request.playerColor().equals("WHITE") && !request.playerColor().equals("BLACK"))) throw new BadRequest("Error: bad request");
+        if (request.gameID() == 0) throw new BadRequest("Error: bad request");
     }
 
 }

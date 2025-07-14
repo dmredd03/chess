@@ -30,4 +30,12 @@ public class GameService {
         int newGameID = gameDAO.createGame(createRequest.gameName());
         return new model.CreateGameResult(newGameID);
     }
+
+    public model.JoinGameResult joinGame(model.JoinGameRequest joinRequest, String authorization) throws DataAccessException, AlreadyTaken {
+        model.AuthData myAuthData = authDAO.getAuth(authorization);
+        model.GameData myGame = gameDAO.getGame(joinRequest.gameID());
+        String myUsername = authDAO.getUserByAuth(authorization);
+        gameDAO.updateGame(joinRequest.playerColor(), myUsername, joinRequest.gameID());
+        return new model.JoinGameResult();
+    }
 }

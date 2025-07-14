@@ -32,6 +32,15 @@ public class MemoryAuthDAO implements AuthDAO {
         throw new DataAccessException("authorization not found");
     }
 
+    public String getUserByAuth(String authToken) throws DataAccessException {
+        for ( model.AuthData currAuthData : authDb ) {
+            if (currAuthData.authToken().equals(authToken)) {
+                return currAuthData.username();
+            }
+        }
+        throw new DataAccessException("authorization not found");
+    }
+
     public void clearAuthDAO() {
         if (!authDb.isEmpty()) authDb.clear();
     }

@@ -2,6 +2,7 @@ package dataaccess;
 
 import chess.ChessGame;
 import model.model;
+import service.AlreadyTaken;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -68,11 +69,26 @@ public class MemoryGameDAO implements GameDAO {
         return formattedGameList;
     }
 
-    public void updateGame(model.GameData newGameState) {
+    public void updateGame(String playerColor, String username, int gameID) throws AlreadyTaken {
+
         for (model.GameData game : gameDb) {
-            if (game.gameID() == newGameState.gameID()) {
-                gameDb.remove(game);
-                gameDb.add(newGameState);
+            if (game.gameID() == gameID) {
+                switch (playerColor) {
+                    case "WHITE":
+                        if (game.whiteUsername() != null) throw new AlreadyTaken("White player already taken");
+                        model.GameData newGameStateWhite = new model.GameData(gameID, username, game.blackUsername(), game.gameName(), game.game());
+                        gameDb.remove(game);
+                        gameDb.add(newGameStateWhite);
+                        break;
+                    case "BLACK":
+                        if (game.blackUsername() != null) throw new AlreadyTaken("Black player already taken");
+                        model.GameData newGameStateBlack = new model.GameData(gameID, game.whiteUsername(), username, game.gameName(), game.game());
+                        gameDb.remove(game);
+                        gameDb.add(newGameStateBlack);
+                        break;
+                    default:
+                        throw new AlreadyTaken("update failed");
+                }
                 break;
             }
         }

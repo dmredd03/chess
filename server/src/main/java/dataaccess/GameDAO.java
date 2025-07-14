@@ -8,6 +8,6 @@ public interface GameDAO {
     int createGame(String gameName) throws DataAccessException;
     model.GameData getGame(int gameID);
     ArrayList<model.printGameData> listGame();
-    void updateGame(model.GameData newGameState);
+    void updateGame(String playerColor, String username, int gameID);
     void clearGameDAO();
 }

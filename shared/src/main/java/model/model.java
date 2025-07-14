@@ -30,6 +30,10 @@ public class model {
     public record CreateGameRequest(String gameName) {}
     public record CreateGameResult(int gameID) {}
 
+    // Join Game records
+    public record JoinGameRequest(String playerColor, int gameID) {}
+    public record JoinGameResult() {}
+
     // Clear records
     public record ClearRequest() {}
     public record ClearResult() {}
