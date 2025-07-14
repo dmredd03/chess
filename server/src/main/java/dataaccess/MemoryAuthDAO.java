@@ -1,20 +1,20 @@
 package dataaccess;
-import model.model;
+import model.Model;
 
 import java.util.ArrayList;
 import java.util.UUID;
 
 public class MemoryAuthDAO implements AuthDAO {
-    private ArrayList<model.AuthData> authDb = new ArrayList<>();
+    private ArrayList<Model.AuthData> authDb = new ArrayList<>();
     public String createAuth(String username) {
         String newToken = generateToken();
-        model.AuthData newAuth = new model.AuthData(newToken, username);
+        Model.AuthData newAuth = new Model.AuthData(newToken, username);
         authDb.add(newAuth);
         return newToken;
     }
 
-    public model.AuthData getAuth(String authToken) throws DataAccessException {
-        for ( model.AuthData currAuthData : authDb ) {
+    public Model.AuthData getAuth(String authToken) throws DataAccessException {
+        for ( Model.AuthData currAuthData : authDb ) {
             if (currAuthData.authToken().equals(authToken)) {
                 return currAuthData;
             }
@@ -23,7 +23,7 @@ public class MemoryAuthDAO implements AuthDAO {
     }
 
     public void deleteAuth(String authToken) throws DataAccessException {
-        for ( model.AuthData currAuthData : authDb ) {
+        for ( Model.AuthData currAuthData : authDb ) {
             if (currAuthData.authToken().equals(authToken)) {
                 authDb.remove(currAuthData);
                 return;
@@ -33,7 +33,7 @@ public class MemoryAuthDAO implements AuthDAO {
     }
 
     public String getUserByAuth(String authToken) throws DataAccessException {
-        for ( model.AuthData currAuthData : authDb ) {
+        for ( Model.AuthData currAuthData : authDb ) {
             if (currAuthData.authToken().equals(authToken)) {
                 return currAuthData.username();
             }

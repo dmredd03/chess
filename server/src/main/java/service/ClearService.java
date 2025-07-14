@@ -3,7 +3,7 @@ package service;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryUserDAO;
-import model.model;
+import model.Model;
 
 public class ClearService {
     private MemoryUserDAO userDAO;
@@ -16,10 +16,10 @@ public class ClearService {
         this.gameDAO = gameDAO;
     }
 
-    public model.ClearResult clear() {
+    public Model.ClearResult clear() {
         userDAO.clearUserDAO();
         gameDAO.clearGameDAO();
         authDAO.clearAuthDAO();
-        return new model.ClearResult();
+        return new Model.ClearResult();
     }
 }

@@ -1,13 +1,13 @@
 package service;// THIS IS FOR TEST
 import dataaccess.DataAccessException;
-import model.model;
+import model.Model;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import dataaccess.MemoryUserDAO;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
 
-public class service {
+public class Service {
     @Test
     public void testRegisterPositive() throws Exception {
         MemoryUserDAO userDAO = new MemoryUserDAO();
@@ -15,11 +15,11 @@ public class service {
         MemoryGameDAO gameDAO = new MemoryGameDAO();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
 
-        model.RegisterRequest req = new model.RegisterRequest("david", "12345", "david@email.com");
+        Model.RegisterRequest req = new Model.RegisterRequest("david", "12345", "david@email.com");
         userService.register(req);
 
-        req = new model.RegisterRequest("sam", "789", "sam@email.com");
-        model.RegisterResult result = userService.register(req);
+        req = new Model.RegisterRequest("sam", "789", "sam@email.com");
+        Model.RegisterResult result = userService.register(req);
 
         assertNotNull(result);
         assertEquals("sam", result.username());
@@ -33,7 +33,7 @@ public class service {
         MemoryGameDAO gameDAO = new MemoryGameDAO();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
 
-        model.RegisterRequest req = new model.RegisterRequest("david", "12345", "david@email.com");
+        Model.RegisterRequest req = new Model.RegisterRequest("david", "12345", "david@email.com");
         userService.register(req);
 
         assertThrows(Exception.class, ()  -> {
@@ -49,10 +49,10 @@ public class service {
         MemoryGameDAO gameDAO = new MemoryGameDAO();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
 
-        model.RegisterRequest regReq = new model.RegisterRequest("david", "12345", "david@email.com");
+        Model.RegisterRequest regReq = new Model.RegisterRequest("david", "12345", "david@email.com");
         userService.register(regReq);
-        model.LoginRequest loginReq = new model.LoginRequest("david", "12345");
-        model.LoginResult result = userService.login(loginReq);
+        Model.LoginRequest loginReq = new Model.LoginRequest("david", "12345");
+        Model.LoginResult result = userService.login(loginReq);
         assertNotNull(result);
         assertEquals("david", result.username());
         assertEquals(result.authToken(), authDAO.getAuth(result.authToken()).authToken());
@@ -65,9 +65,9 @@ public class service {
         MemoryGameDAO gameDAO = new MemoryGameDAO();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
 
-        model.RegisterRequest regReq = new model.RegisterRequest("david", "12345", "david@email.com");
+        Model.RegisterRequest regReq = new Model.RegisterRequest("david", "12345", "david@email.com");
         userService.register(regReq);
-        model.LoginRequest loginReq = new model.LoginRequest("david", "wrongpassword");
+        Model.LoginRequest loginReq = new Model.LoginRequest("david", "wrongpassword");
         assertThrows(Exception.class, () -> {
             userService.login(loginReq);
         });
@@ -80,10 +80,10 @@ public class service {
         MemoryAuthDAO authDAO = new MemoryAuthDAO();
         MemoryGameDAO gameDAO = new MemoryGameDAO();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
-        model.RegisterRequest regReq = new model.RegisterRequest("david", "12345", "david@email.com");
-        model.RegisterResult regResult = userService.register(regReq);
+        Model.RegisterRequest regReq = new Model.RegisterRequest("david", "12345", "david@email.com");
+        Model.RegisterResult regResult = userService.register(regReq);
 
-        model.LogoutRequest req = new model.LogoutRequest(regResult.authToken());
+        Model.LogoutRequest req = new Model.LogoutRequest(regResult.authToken());
         assertDoesNotThrow(() -> userService.logout(req));
     }
 
@@ -93,11 +93,11 @@ public class service {
         MemoryAuthDAO authDAO = new MemoryAuthDAO();
         MemoryGameDAO gameDAO = new MemoryGameDAO();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
-        model.RegisterRequest regReq = new model.RegisterRequest("david", "12345", "david@email.com");
+        Model.RegisterRequest regReq = new Model.RegisterRequest("david", "12345", "david@email.com");
         userService.register(regReq);
 
         assertThrows(DataAccessException.class, () -> {
-            model.LogoutRequest req = new model.LogoutRequest("1234567890BadAuth");
+            Model.LogoutRequest req = new Model.LogoutRequest("1234567890BadAuth");
             userService.logout(req);
         });
 
@@ -111,19 +111,19 @@ public class service {
         MemoryAuthDAO authDAO = new MemoryAuthDAO();
         MemoryGameDAO gameDAO = new MemoryGameDAO();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
-        model.RegisterRequest regReq = new model.RegisterRequest("david", "12345", "david@email.com");
+        Model.RegisterRequest regReq = new Model.RegisterRequest("david", "12345", "david@email.com");
         userService.register(regReq);
-        model.LoginRequest loginReq = new model.LoginRequest("david", "12345");
-        model.LoginResult loginResult = userService.login(loginReq);
+        Model.LoginRequest loginReq = new Model.LoginRequest("david", "12345");
+        Model.LoginResult loginResult = userService.login(loginReq);
 
-        model.CreateGameRequest gameReq = new model.CreateGameRequest("myFirstGame");
-        model.CreateGameRequest gameReq2 = new model.CreateGameRequest("mySecondGame");
+        Model.CreateGameRequest gameReq = new Model.CreateGameRequest("myFirstGame");
+        Model.CreateGameRequest gameReq2 = new Model.CreateGameRequest("mySecondGame");
         GameService gameService = new GameService(userDAO, authDAO, gameDAO);
         gameService.createGame(gameReq, authDAO.getAuth(loginResult.authToken()).authToken());
         gameService.createGame(gameReq2, authDAO.getAuth(loginResult.authToken()).authToken());
 
         assertDoesNotThrow(() -> {
-            gameService.listGames(new model.ListGameRequest(authDAO.getAuth(loginResult.authToken()).authToken()));
+            gameService.listGames(new Model.ListGameRequest(authDAO.getAuth(loginResult.authToken()).authToken()));
         });
     }
 
@@ -133,19 +133,19 @@ public class service {
         MemoryAuthDAO authDAO = new MemoryAuthDAO();
         MemoryGameDAO gameDAO = new MemoryGameDAO();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
-        model.RegisterRequest regReq = new model.RegisterRequest("david", "12345", "david@email.com");
+        Model.RegisterRequest regReq = new Model.RegisterRequest("david", "12345", "david@email.com");
         userService.register(regReq);
-        model.LoginRequest loginReq = new model.LoginRequest("david", "12345");
-        model.LoginResult loginResult = userService.login(loginReq);
+        Model.LoginRequest loginReq = new Model.LoginRequest("david", "12345");
+        Model.LoginResult loginResult = userService.login(loginReq);
 
-        model.CreateGameRequest gameReq = new model.CreateGameRequest("myFirstGame");
-        model.CreateGameRequest gameReq2 = new model.CreateGameRequest("mySecondGame");
+        Model.CreateGameRequest gameReq = new Model.CreateGameRequest("myFirstGame");
+        Model.CreateGameRequest gameReq2 = new Model.CreateGameRequest("mySecondGame");
         GameService gameService = new GameService(userDAO, authDAO, gameDAO);
         gameService.createGame(gameReq, authDAO.getAuth(loginResult.authToken()).authToken());
         gameService.createGame(gameReq2, authDAO.getAuth(loginResult.authToken()).authToken());
 
         assertThrows(Exception.class, () -> {
-            gameService.listGames(new model.ListGameRequest("Bad authorization"));
+            gameService.listGames(new Model.ListGameRequest("Bad authorization"));
         });
     }
 
@@ -157,13 +157,13 @@ public class service {
         MemoryAuthDAO authDAO = new MemoryAuthDAO();
         MemoryGameDAO gameDAO = new MemoryGameDAO();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
-        model.RegisterRequest regReq = new model.RegisterRequest("david", "12345", "david@email.com");
+        Model.RegisterRequest regReq = new Model.RegisterRequest("david", "12345", "david@email.com");
         userService.register(regReq);
-        model.LoginRequest loginReq = new model.LoginRequest("david", "12345");
-        model.LoginResult loginResult = userService.login(loginReq);
+        Model.LoginRequest loginReq = new Model.LoginRequest("david", "12345");
+        Model.LoginResult loginResult = userService.login(loginReq);
 
-        model.CreateGameRequest gameReq = new model.CreateGameRequest("myFirstGame");
-        model.CreateGameRequest gameReq2 = new model.CreateGameRequest("mySecondGame");
+        Model.CreateGameRequest gameReq = new Model.CreateGameRequest("myFirstGame");
+        Model.CreateGameRequest gameReq2 = new Model.CreateGameRequest("mySecondGame");
         GameService gameService = new GameService(userDAO, authDAO, gameDAO);
         gameService.createGame(gameReq, authDAO.getAuth(loginResult.authToken()).authToken());
         assertDoesNotThrow(() -> {
@@ -177,13 +177,13 @@ public class service {
         MemoryAuthDAO authDAO = new MemoryAuthDAO();
         MemoryGameDAO gameDAO = new MemoryGameDAO();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
-        model.RegisterRequest regReq = new model.RegisterRequest("david", "12345", "david@email.com");
+        Model.RegisterRequest regReq = new Model.RegisterRequest("david", "12345", "david@email.com");
         userService.register(regReq);
-        model.LoginRequest loginReq = new model.LoginRequest("david", "12345");
-        model.LoginResult loginResult = userService.login(loginReq);
+        Model.LoginRequest loginReq = new Model.LoginRequest("david", "12345");
+        Model.LoginResult loginResult = userService.login(loginReq);
 
-        model.CreateGameRequest gameReq = new model.CreateGameRequest("sameName");
-        model.CreateGameRequest gameReq2 = new model.CreateGameRequest("sameName");
+        Model.CreateGameRequest gameReq = new Model.CreateGameRequest("sameName");
+        Model.CreateGameRequest gameReq2 = new Model.CreateGameRequest("sameName");
         GameService gameService = new GameService(userDAO, authDAO, gameDAO);
         gameService.createGame(gameReq, authDAO.getAuth(loginResult.authToken()).authToken());
         assertThrows(Exception.class, () -> {
@@ -198,30 +198,30 @@ public class service {
         MemoryAuthDAO authDAO = new MemoryAuthDAO();
         MemoryGameDAO gameDAO = new MemoryGameDAO();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
-        model.RegisterRequest regReq = new model.RegisterRequest("david", "12345", "david@email.com");
+        Model.RegisterRequest regReq = new Model.RegisterRequest("david", "12345", "david@email.com");
         userService.register(regReq);
-        model.LoginRequest loginReq = new model.LoginRequest("david", "12345");
-        model.LoginResult loginResult = userService.login(loginReq);
+        Model.LoginRequest loginReq = new Model.LoginRequest("david", "12345");
+        Model.LoginResult loginResult = userService.login(loginReq);
 
-        model.RegisterRequest regReq2 = new model.RegisterRequest("sam", "67890", "sam@email.com");
+        Model.RegisterRequest regReq2 = new Model.RegisterRequest("sam", "67890", "sam@email.com");
         userService.register(regReq2);
-        model.LoginRequest loginReq2 = new model.LoginRequest("sam", "67890");
-        model.LoginResult loginResult2 = userService.login(loginReq2);
+        Model.LoginRequest loginReq2 = new Model.LoginRequest("sam", "67890");
+        Model.LoginResult loginResult2 = userService.login(loginReq2);
 
-        model.CreateGameRequest gameReq = new model.CreateGameRequest("All by myself");
-        model.CreateGameRequest gameReq2 = new model.CreateGameRequest("With a friend :)");
+        Model.CreateGameRequest gameReq = new Model.CreateGameRequest("All by myself");
+        Model.CreateGameRequest gameReq2 = new Model.CreateGameRequest("With a friend :)");
         GameService gameService = new GameService(userDAO, authDAO, gameDAO);
         int gameID1 = gameService.createGame(gameReq, authDAO.getAuth(loginResult.authToken()).authToken()).gameID();
         int gameID2 = gameService.createGame(gameReq2, authDAO.getAuth(loginResult.authToken()).authToken()).gameID();
 
         assertDoesNotThrow(() -> {
-            model.JoinGameRequest joinReq01 = new model.JoinGameRequest("WHITE", gameID1);
-            model.JoinGameRequest joinReq02 = new model.JoinGameRequest("BLACK", gameID1);
+            Model.JoinGameRequest joinReq01 = new Model.JoinGameRequest("WHITE", gameID1);
+            Model.JoinGameRequest joinReq02 = new Model.JoinGameRequest("BLACK", gameID1);
             gameService.joinGame(joinReq01, authDAO.getAuth(loginResult.authToken()).authToken());
             gameService.joinGame(joinReq02, authDAO.getAuth(loginResult.authToken()).authToken());
 
-            model.JoinGameRequest joinReq03 = new model.JoinGameRequest("WHITE", gameID2);
-            model.JoinGameRequest joinReq04 = new model.JoinGameRequest("BLACK", gameID2);
+            Model.JoinGameRequest joinReq03 = new Model.JoinGameRequest("WHITE", gameID2);
+            Model.JoinGameRequest joinReq04 = new Model.JoinGameRequest("BLACK", gameID2);
             gameService.joinGame(joinReq03, authDAO.getAuth(loginResult.authToken()).authToken());
             gameService.joinGame(joinReq04, authDAO.getAuth(loginResult2.authToken()).authToken());
         });
@@ -233,30 +233,30 @@ public class service {
         MemoryAuthDAO authDAO = new MemoryAuthDAO();
         MemoryGameDAO gameDAO = new MemoryGameDAO();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
-        model.RegisterRequest regReq = new model.RegisterRequest("david", "12345", "david@email.com");
+        Model.RegisterRequest regReq = new Model.RegisterRequest("david", "12345", "david@email.com");
         userService.register(regReq);
-        model.LoginRequest loginReq = new model.LoginRequest("david", "12345");
-        model.LoginResult loginResult = userService.login(loginReq);
+        Model.LoginRequest loginReq = new Model.LoginRequest("david", "12345");
+        Model.LoginResult loginResult = userService.login(loginReq);
 
-        model.RegisterRequest regReq2 = new model.RegisterRequest("sam", "67890", "sam@email.com");
+        Model.RegisterRequest regReq2 = new Model.RegisterRequest("sam", "67890", "sam@email.com");
         userService.register(regReq2);
-        model.LoginRequest loginReq2 = new model.LoginRequest("sam", "67890");
-        model.LoginResult loginResult2 = userService.login(loginReq2);
+        Model.LoginRequest loginReq2 = new Model.LoginRequest("sam", "67890");
+        Model.LoginResult loginResult2 = userService.login(loginReq2);
 
-        model.CreateGameRequest gameReq = new model.CreateGameRequest("Bad playerColor");
-        model.CreateGameRequest gameReq2 = new model.CreateGameRequest("Taking someone's place");
+        Model.CreateGameRequest gameReq = new Model.CreateGameRequest("Bad playerColor");
+        Model.CreateGameRequest gameReq2 = new Model.CreateGameRequest("Taking someone's place");
         GameService gameService = new GameService(userDAO, authDAO, gameDAO);
         int gameID1 = gameService.createGame(gameReq, authDAO.getAuth(loginResult.authToken()).authToken()).gameID();
         int gameID2 = gameService.createGame(gameReq2, authDAO.getAuth(loginResult.authToken()).authToken()).gameID();
         assertThrows(Exception.class, () -> {
-            model.JoinGameRequest joinReq01 = new model.JoinGameRequest("WHITE", gameID1);
-            model.JoinGameRequest joinReq02 = new model.JoinGameRequest("PINK", gameID1);
+            Model.JoinGameRequest joinReq01 = new Model.JoinGameRequest("WHITE", gameID1);
+            Model.JoinGameRequest joinReq02 = new Model.JoinGameRequest("PINK", gameID1);
             gameService.joinGame(joinReq01, authDAO.getAuth(loginResult.authToken()).authToken());
             gameService.joinGame(joinReq02, authDAO.getAuth(loginResult.authToken()).authToken());
         });
         assertThrows(Exception.class, () -> {
-            model.JoinGameRequest joinReq03 = new model.JoinGameRequest("WHITE", gameID2);
-            model.JoinGameRequest joinReq04 = new model.JoinGameRequest("WHITE", gameID2);
+            Model.JoinGameRequest joinReq03 = new Model.JoinGameRequest("WHITE", gameID2);
+            Model.JoinGameRequest joinReq04 = new Model.JoinGameRequest("WHITE", gameID2);
             gameService.joinGame(joinReq03, authDAO.getAuth(loginResult.authToken()).authToken());
             gameService.joinGame(joinReq04, authDAO.getAuth(loginResult2.authToken()).authToken());
         });
@@ -270,7 +270,7 @@ public class service {
         MemoryGameDAO gameDAO = new MemoryGameDAO();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
         ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
-        model.RegisterRequest req = new model.RegisterRequest("david", "12345", "david@email.com");
+        Model.RegisterRequest req = new Model.RegisterRequest("david", "12345", "david@email.com");
         userService.register(req);
         clearService.clear();
 

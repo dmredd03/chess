@@ -18,23 +18,23 @@ public class PieceMovesCalculator {
     public Collection<ChessMove> getPossibleMoves() {
         this.piece = board.getPiece(startPosition);
         if (piece.getPieceType() == ChessPiece.PieceType.BISHOP) {
-            BishopMovesCalculator();
+            bishopMovesCalculator();
         } else if (piece.getPieceType() == ChessPiece.PieceType.KNIGHT) {
-            KnightMovesCalculator();
+            knightMovesCalculator();
         } else if (piece.getPieceType() == ChessPiece.PieceType.ROOK) {
-            RookMovesCalculator();
+            rookMovesCalculator();
         } else if (piece.getPieceType() == ChessPiece.PieceType.QUEEN) {
-            QueenMovesCalculator();
+            queenMovesCalculator();
         } else if (piece.getPieceType() == ChessPiece.PieceType.KING) {
-            KingMovesCalculator();
+            kingMovesCalculator();
         } else { // ChessPiece.PieceType.PAWN
-            PawnMovesCalculator();
+            pawnMovesCalculator();
         }
 
         return possibleMoves;
     }
 
-    private void BishopMovesCalculator() {
+    private void bishopMovesCalculator() {
         int currRow = startPosition.getRow();
         int currCol = startPosition.getColumn();
 
@@ -143,7 +143,7 @@ public class PieceMovesCalculator {
     }
 
     //Start Rook movement code
-    private void RookMovesCalculator() {
+    private void rookMovesCalculator() {
         int currRow = startPosition.getRow();
         int currCol = startPosition.getColumn();
 
@@ -245,29 +245,29 @@ public class PieceMovesCalculator {
     }
 
     // Start Queen movement code
-    private void QueenMovesCalculator() {
-        BishopMovesCalculator();
-        RookMovesCalculator();
+    private void queenMovesCalculator() {
+        bishopMovesCalculator();
+        rookMovesCalculator();
     }
 
     // Start Knight movement code
-    private void KnightMovesCalculator() {
+    private void knightMovesCalculator() {
         int currRow = startPosition.getRow();
         int currCol = startPosition.getColumn();
 
         // test each direction
 
-        KnightTestMovablePosition(currRow + 2, currCol + 1); // up 2 right 1
-        KnightTestMovablePosition(currRow + 1, currCol + 2); // up 1 right 2
-        KnightTestMovablePosition(currRow - 1, currCol + 2); // down 1 right 2
-        KnightTestMovablePosition(currRow - 2, currCol + 1); // down 2 right 1
-        KnightTestMovablePosition(currRow - 2, currCol - 1); // down 2 left 1
-        KnightTestMovablePosition(currRow - 1, currCol - 2); // down 1 left 2
-        KnightTestMovablePosition(currRow + 1,  currCol - 2); // up 1 left 2
-        KnightTestMovablePosition(currRow + 2, currCol - 1); // up 2 left 1
+        knightTestMovablePosition(currRow + 2, currCol + 1); // up 2 right 1
+        knightTestMovablePosition(currRow + 1, currCol + 2); // up 1 right 2
+        knightTestMovablePosition(currRow - 1, currCol + 2); // down 1 right 2
+        knightTestMovablePosition(currRow - 2, currCol + 1); // down 2 right 1
+        knightTestMovablePosition(currRow - 2, currCol - 1); // down 2 left 1
+        knightTestMovablePosition(currRow - 1, currCol - 2); // down 1 left 2
+        knightTestMovablePosition(currRow + 1,  currCol - 2); // up 1 left 2
+        knightTestMovablePosition(currRow + 2, currCol - 1); // up 2 left 1
     }
 
-    private void KnightTestMovablePosition(int currRow, int currCol) {
+    private void knightTestMovablePosition(int currRow, int currCol) {
 
         if (currCol > 8 || currCol < 1 || currRow > 8 || currRow < 1) return;
 
@@ -286,20 +286,20 @@ public class PieceMovesCalculator {
     }
 
     // Start King movement code
-    private void KingMovesCalculator() {
+    private void kingMovesCalculator() {
         int kingRow = startPosition.getRow();
         int kingCol = startPosition.getColumn();
-        KingTestMovablePosition(kingRow + 1, kingCol); // up
-        KingTestMovablePosition(kingRow + 1, kingCol + 1); // up right
-        KingTestMovablePosition(kingRow, kingCol + 1); // right
-        KingTestMovablePosition(kingRow - 1, kingCol + 1); // down right
-        KingTestMovablePosition(kingRow - 1, kingCol); // down
-        KingTestMovablePosition(kingRow - 1, kingCol - 1); // down left
-        KingTestMovablePosition(kingRow, kingCol - 1); // left
-        KingTestMovablePosition(kingRow + 1, kingCol - 1); // up left
+        kingTestMovablePosition(kingRow + 1, kingCol); // up
+        kingTestMovablePosition(kingRow + 1, kingCol + 1); // up right
+        kingTestMovablePosition(kingRow, kingCol + 1); // right
+        kingTestMovablePosition(kingRow - 1, kingCol + 1); // down right
+        kingTestMovablePosition(kingRow - 1, kingCol); // down
+        kingTestMovablePosition(kingRow - 1, kingCol - 1); // down left
+        kingTestMovablePosition(kingRow, kingCol - 1); // left
+        kingTestMovablePosition(kingRow + 1, kingCol - 1); // up left
     }
 
-    private void KingTestMovablePosition(int currRow, int currCol) {
+    private void kingTestMovablePosition(int currRow, int currCol) {
         if (currRow <= 8 && currRow >= 1 && currCol <= 8 && currCol >= 1) {
             ChessPosition testPos = new ChessPosition(currRow, currCol);
             ChessPiece currChessPiece = board.getPiece(testPos);
@@ -319,7 +319,7 @@ public class PieceMovesCalculator {
     }
 
     // Start Pawn movement code
-    private void PawnMovesCalculator() {
+    private void pawnMovesCalculator() {
         int currRow = startPosition.getRow();
         int currCol = startPosition.getColumn();
 
@@ -330,11 +330,11 @@ public class PieceMovesCalculator {
             ChessPosition forwardPosition = new ChessPosition(currRow + 1, currCol);
             ChessPiece forwardPiece = board.getPiece(forwardPosition);
             if (forwardPiece == null) {
-                PawnPromotionCheck(forwardPosition);
+                pawnPromotionCheck(forwardPosition);
                 if (startPosition.getRow() == 2) {
                     ChessPosition doubleForwardPosition = new ChessPosition(currRow + 2, currCol);
                     ChessPiece doubleForwardPiece = board.getPiece(doubleForwardPosition);
-                    if (doubleForwardPiece == null) PawnPromotionCheck(doubleForwardPosition);
+                    if (doubleForwardPiece == null) pawnPromotionCheck(doubleForwardPosition);
                 }
             }
             // black
@@ -342,11 +342,11 @@ public class PieceMovesCalculator {
             ChessPosition forwardPosition = new ChessPosition(currRow - 1, currCol);
             ChessPiece forwardPiece = board.getPiece(forwardPosition);
             if (forwardPiece == null) {
-                PawnPromotionCheck(forwardPosition);
+                pawnPromotionCheck(forwardPosition);
                 if (startPosition.getRow() == 7) {
                     ChessPosition doubleForwardPosition = new ChessPosition(currRow - 2, currCol);
                     ChessPiece doubleForwardPiece = board.getPiece(doubleForwardPosition);
-                    if (doubleForwardPiece == null) PawnPromotionCheck(doubleForwardPosition);
+                    if (doubleForwardPiece == null) pawnPromotionCheck(doubleForwardPosition);
                 }
             }
         }
@@ -361,7 +361,7 @@ public class PieceMovesCalculator {
                 if (leftAttackPiece == null) {
                     ; // continue
                 } else if (leftAttackPiece.getTeamColor() == ChessGame.TeamColor.BLACK) {
-                    PawnPromotionCheck(leftAttackPos);
+                    pawnPromotionCheck(leftAttackPos);
                 }
             }
 
@@ -372,7 +372,7 @@ public class PieceMovesCalculator {
                 if (rightAttackPiece == null) {
                     ; //continue
                 } else if (rightAttackPiece.getTeamColor() == ChessGame.TeamColor.BLACK) {
-                    PawnPromotionCheck(rightAttackPos);
+                    pawnPromotionCheck(rightAttackPos);
                 }
             }
         }
@@ -385,7 +385,7 @@ public class PieceMovesCalculator {
                 if (leftAttackPiece == null) {
                     ; // continue
                 } else if (leftAttackPiece.getTeamColor() == ChessGame.TeamColor.WHITE) {
-                    PawnPromotionCheck(leftAttackPos);
+                    pawnPromotionCheck(leftAttackPos);
                 }
             }
 
@@ -396,13 +396,13 @@ public class PieceMovesCalculator {
                 if (rightAttackPiece == null) {
                     ; // continue
                 } else if (rightAttackPiece.getTeamColor() == ChessGame.TeamColor.WHITE) {
-                    PawnPromotionCheck(rightAttackPos);
+                    pawnPromotionCheck(rightAttackPos);
                 }
             }
         }
     }
 
-    private void PawnPromotionCheck(ChessPosition testPosition) {
+    private void pawnPromotionCheck(ChessPosition testPosition) {
         ChessMove currentMove;
 
         if (testPosition.getRow() == 8 && piece.getTeamColor() == ChessGame.TeamColor.WHITE) {

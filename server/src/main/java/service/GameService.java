@@ -4,7 +4,7 @@ import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryUserDAO;
-import model.model;
+import model.Model;
 
 import java.util.ArrayList;
 
@@ -19,23 +19,23 @@ public class GameService {
         this.gameDAO = gameDAO;
     }
 
-    public model.ListGameResult listGames(model.ListGameRequest listGameRequest) throws DataAccessException {
-        model.AuthData myAuthData = authDAO.getAuth(listGameRequest.authorization());
-        ArrayList<model.printGameData> gameList = gameDAO.listGame();
-        return new model.ListGameResult(gameList);
+    public Model.ListGameResult listGames(Model.ListGameRequest listGameRequest) throws DataAccessException {
+        Model.AuthData myAuthData = authDAO.getAuth(listGameRequest.authorization());
+        ArrayList<Model.PrintGameData> gameList = gameDAO.listGame();
+        return new Model.ListGameResult(gameList);
     }
 
-    public model.CreateGameResult createGame(model.CreateGameRequest createRequest, String authorization) throws DataAccessException {
-        model.AuthData myAuthData = authDAO.getAuth(authorization);
+    public Model.CreateGameResult createGame(Model.CreateGameRequest createRequest, String authorization) throws DataAccessException {
+        Model.AuthData myAuthData = authDAO.getAuth(authorization);
         int newGameID = gameDAO.createGame(createRequest.gameName());
-        return new model.CreateGameResult(newGameID);
+        return new Model.CreateGameResult(newGameID);
     }
 
-    public model.JoinGameResult joinGame(model.JoinGameRequest joinRequest, String authorization) throws DataAccessException, AlreadyTaken {
-        model.AuthData myAuthData = authDAO.getAuth(authorization);
-        model.GameData myGame = gameDAO.getGame(joinRequest.gameID());
+    public Model.JoinGameResult joinGame(Model.JoinGameRequest joinRequest, String authorization) throws DataAccessException, AlreadyTaken {
+        Model.AuthData myAuthData = authDAO.getAuth(authorization);
+        Model.GameData myGame = gameDAO.getGame(joinRequest.gameID());
         String myUsername = authDAO.getUserByAuth(authorization);
         gameDAO.updateGame(joinRequest.playerColor(), myUsername, joinRequest.gameID());
-        return new model.JoinGameResult();
+        return new Model.JoinGameResult();
     }
 }

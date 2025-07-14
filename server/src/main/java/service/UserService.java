@@ -4,10 +4,7 @@ import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryUserDAO;
 
-import model.model;
-import spark.Request;
-import spark.Response;
-
+import model.Model;
 
 
 public class UserService {
@@ -21,9 +18,9 @@ public class UserService {
         this.gameDAO = gameDAO;
     }
 
-    public model.RegisterResult register(model.RegisterRequest registerRequest) throws DataAccessException {
+    public Model.RegisterResult register(Model.RegisterRequest registerRequest) throws DataAccessException {
 
-        model.UserData newUser = userDAO.getUser(registerRequest.username());
+        Model.UserData newUser = userDAO.getUser(registerRequest.username());
         if (newUser == null) {
             ; // person doesn't exist, continue
         } else {
@@ -31,14 +28,14 @@ public class UserService {
             throw new DataAccessException("User already exists");
         }
 
-        userDAO.createUser(new model.UserData(registerRequest.username(), registerRequest.password(), registerRequest.email()));
+        userDAO.createUser(new Model.UserData(registerRequest.username(), registerRequest.password(), registerRequest.email()));
         String authKey = authDAO.createAuth(registerRequest.username());
-        return new model.RegisterResult(registerRequest.username(), authKey);
+        return new Model.RegisterResult(registerRequest.username(), authKey);
     }
 
-    public model.LoginResult login(model.LoginRequest loginRequest) throws DataAccessException {
-        model.UserData inputtedData = new model.UserData(loginRequest.username(), loginRequest.password(), null);
-        model.UserData loginUser = userDAO.getUser(loginRequest.username());
+    public Model.LoginResult login(Model.LoginRequest loginRequest) throws DataAccessException {
+        Model.UserData inputtedData = new Model.UserData(loginRequest.username(), loginRequest.password(), null);
+        Model.UserData loginUser = userDAO.getUser(loginRequest.username());
         if (loginUser == null) {
             throw new DataAccessException("unauthorized");
         }
@@ -47,13 +44,13 @@ public class UserService {
 
         String myAuthToken = authDAO.createAuth(loginRequest.username());
 
-        return new model.LoginResult(loginUser.username(), myAuthToken);
+        return new Model.LoginResult(loginUser.username(), myAuthToken);
     }
 
-    public model.LogoutResult logout(model.LogoutRequest logoutRequest) throws DataAccessException {
-        model.AuthData myAuthToken = authDAO.getAuth(logoutRequest.authorization()); // throws unauthorized exception if not found
+    public Model.LogoutResult logout(Model.LogoutRequest logoutRequest) throws DataAccessException {
+        Model.AuthData myAuthToken = authDAO.getAuth(logoutRequest.authorization()); // throws unauthorized exception if not found
         authDAO.deleteAuth(myAuthToken.authToken());
-        return new model.LogoutResult();
+        return new Model.LogoutResult();
     }
 }
 

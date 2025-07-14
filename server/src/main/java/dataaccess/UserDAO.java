@@ -1,10 +1,10 @@
 package dataaccess;
-import model.model;
+import model.Model;
 
 interface UserDAO {
-    model.UserData getUser(String username) throws DataAccessException;
-    void createUser(model.UserData newUsername);
-    Boolean matchingPassword(model.UserData user);
+    Model.UserData getUser(String username) throws DataAccessException;
+    void createUser(Model.UserData newUsername);
+    Boolean matchingPassword(Model.UserData user);
     void clearUserDAO();
 }
 
