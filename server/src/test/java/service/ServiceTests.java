@@ -7,7 +7,7 @@ import dataaccess.MemoryUserDAO;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
 
-public class Service {
+public class ServiceTests {
     @Test
     public void testRegisterPositive() throws Exception {
         MemoryUserDAO userDAO = new MemoryUserDAO();
