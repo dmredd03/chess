@@ -40,7 +40,7 @@ public class UserService {
             throw new DataAccessException("unauthorized");
         }
         // Check if password is correct
-        if (!userDAO.matchingPassword(inputtedData)) throw new DataAccessException("unauthorized");
+        if (!userDAO.matchingPassword(inputtedData)) { throw new DataAccessException("unauthorized"); }
 
         String myAuthToken = authDAO.createAuth(loginRequest.username());
 

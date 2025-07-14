@@ -54,8 +54,8 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        // TODO: implement checking and stalemates
-        if (gameBoard.getPiece(startPosition) == null) return null;
+
+        if (gameBoard.getPiece(startPosition) == null) { return null; }
 
         Collection<ChessMove> possibleMoves = gameBoard.getPiece(startPosition).pieceMoves(gameBoard, startPosition);
         Collection<ChessMove> badMoves = new ArrayList<>();
@@ -93,7 +93,7 @@ public class ChessGame {
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPiece pieceToMove = gameBoard.getPiece(move.getStartPosition());
         // if piece doesn't exist, throw exception
-        if (pieceToMove == null) throw new InvalidMoveException();
+        if (pieceToMove == null) { throw new InvalidMoveException(); }
         // getting possible moves from chessPiece
         Collection<ChessMove> possibleValidMoves = pieceToMove.pieceMoves(gameBoard, move.getStartPosition());
         // if not a possible move in any way, throw exception
@@ -104,9 +104,9 @@ public class ChessGame {
                 break;
             }
         }
-        if (invalid) throw new InvalidMoveException();
+        if (invalid) { throw new InvalidMoveException(); }
         // if not your turn, you can't move
-        if (pieceToMove.getTeamColor() != teamTurn) throw new InvalidMoveException();
+        if (pieceToMove.getTeamColor() != teamTurn) { throw new InvalidMoveException(); }
 
         gameBoard.addPiece(move.getStartPosition(), null);
         // pawn promotion check
@@ -124,7 +124,7 @@ public class ChessGame {
         }
 
         // after movement checks
-        if (isInCheck(pieceToMove.pieceColor)) throw new InvalidMoveException();
+        if (isInCheck(pieceToMove.pieceColor)) { throw new InvalidMoveException(); }
         // stalemate check here
         if (pieceToMove.getTeamColor() == TeamColor.WHITE) {
             teamTurn = TeamColor.BLACK;
@@ -145,7 +145,7 @@ public class ChessGame {
         // ChessPiece king = gameBoard.getPiece(kingPos);
         // Collection<ChessMove> kingMoves = king.pieceMoves(gameBoard, kingPos);
 
-        if (inDanger(kingPos, teamColor)) check = true;
+        if (inDanger(kingPos, teamColor)) { check = true; }
         return check;
     }
 
@@ -179,7 +179,7 @@ public class ChessGame {
 
             try {
                 currentGameState.makeMove(move);
-                if (!currentGameState.isInCheck(teamColor)) return true;
+                if (!currentGameState.isInCheck(teamColor)) { return true; }
 
             } catch (InvalidMoveException e){
                 ;

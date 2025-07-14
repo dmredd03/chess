@@ -42,7 +42,7 @@ public class MemoryAuthDAO implements AuthDAO {
     }
 
     public void clearAuthDAO() {
-        if (!authDb.isEmpty()) authDb.clear();
+        if (!authDb.isEmpty()) { authDb.clear(); }
     }
 
     private static String generateToken() {

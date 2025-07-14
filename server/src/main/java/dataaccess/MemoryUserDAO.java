@@ -20,7 +20,7 @@ public class MemoryUserDAO implements UserDAO {
     }
 
     public Boolean matchingPassword(Model.UserData user) {
-        if (userDb.isEmpty()) return false;
+        if (userDb.isEmpty()) { return false; }
         for (Model.UserData testUser : userDb) {
             if (testUser.password().equals(user.password()) && testUser.username().equals(user.username())) {
                 return true;
@@ -30,6 +30,6 @@ public class MemoryUserDAO implements UserDAO {
     }
 
     public void clearUserDAO() {
-        if (!userDb.isEmpty()) userDb.clear();
+        if (!userDb.isEmpty()) { userDb.clear(); }
     }
 }

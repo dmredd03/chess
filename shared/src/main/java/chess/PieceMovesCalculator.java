@@ -116,7 +116,7 @@ public class PieceMovesCalculator {
 
     private void knightTestMovablePosition(int currRow, int currCol) {
 
-        if (currCol > 8 || currCol < 1 || currRow > 8 || currRow < 1) return;
+        if (currCol > 8 || currCol < 1 || currRow > 8 || currRow < 1) { return; }
 
         ChessPosition currChessMovePosition = new ChessPosition(currRow, currCol);
         ChessPiece chessPiece = board.getPiece(currChessMovePosition);
@@ -181,7 +181,7 @@ public class PieceMovesCalculator {
                 if (startPosition.getRow() == 2) {
                     ChessPosition doubleForwardPosition = new ChessPosition(currRow + 2, currCol);
                     ChessPiece doubleForwardPiece = board.getPiece(doubleForwardPosition);
-                    if (doubleForwardPiece == null) pawnPromotionCheck(doubleForwardPosition);
+                    if (doubleForwardPiece == null) { pawnPromotionCheck(doubleForwardPosition); }
                 }
             }
             // black
@@ -193,7 +193,7 @@ public class PieceMovesCalculator {
                 if (startPosition.getRow() == 7) {
                     ChessPosition doubleForwardPosition = new ChessPosition(currRow - 2, currCol);
                     ChessPiece doubleForwardPiece = board.getPiece(doubleForwardPosition);
-                    if (doubleForwardPiece == null) pawnPromotionCheck(doubleForwardPosition);
+                    if (doubleForwardPiece == null) { pawnPromotionCheck(doubleForwardPosition); }
                 }
             }
         }

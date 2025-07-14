@@ -5,7 +5,7 @@ import spark.*;
 import dataaccess.MemoryUserDAO;
 import dataaccess.MemoryAuthDAO;
 import handler.HandlerLogic;
-//TODO: import GameDAO when implemented
+
 
 public class Server {
     private MemoryUserDAO userDAO;

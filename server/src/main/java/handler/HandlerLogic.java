@@ -203,13 +203,13 @@ public class HandlerLogic implements Route {
     }
 
     private void badRequestCreateGame(Model.CreateGameRequest createGameRequest) throws BadRequest {
-        if (createGameRequest.gameName() == null || createGameRequest.gameName().isBlank()) throw new BadRequest("Error: bad request");
+        if (createGameRequest.gameName() == null || createGameRequest.gameName().isBlank()) { throw new BadRequest("Error: bad request"); }
     }
 
     private void badRequestJoinGame(Model.JoinGameRequest request) throws BadRequest {
         if (request.playerColor() == null ||
-                (!request.playerColor().equals("WHITE") && !request.playerColor().equals("BLACK"))) throw new BadRequest("Error: bad request");
-        if (request.gameID() == 0) throw new BadRequest("Error: bad request");
+                (!request.playerColor().equals("WHITE") && !request.playerColor().equals("BLACK"))) { throw new BadRequest("Error: bad request"); }
+        if (request.gameID() == 0) { throw new BadRequest("Error: bad request"); }
     }
 
 }

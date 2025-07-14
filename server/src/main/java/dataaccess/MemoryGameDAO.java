@@ -7,7 +7,7 @@ import service.AlreadyTaken;
 import java.util.ArrayList;
 import java.util.Random;
 
-// TODO: Implement serialization (creo que)
+
 public class MemoryGameDAO implements GameDAO {
     private ArrayList<Model.GameData> gameDb = new ArrayList<>();
 
@@ -61,7 +61,7 @@ public class MemoryGameDAO implements GameDAO {
 
     public ArrayList<Model.PrintGameData> listGame() {
         ArrayList<Model.PrintGameData> formattedGameList = new ArrayList<>();
-        if (gameDb.isEmpty()) return formattedGameList;
+        if (gameDb.isEmpty()) { return formattedGameList; }
 
         for (Model.GameData gameData : gameDb) {
             formattedGameList.add(formatGameData(gameData));
@@ -75,13 +75,13 @@ public class MemoryGameDAO implements GameDAO {
             if (game.gameID() == gameID) {
                 switch (playerColor) {
                     case "WHITE":
-                        if (game.whiteUsername() != null) throw new AlreadyTaken("White player already taken");
+                        if (game.whiteUsername() != null) { throw new AlreadyTaken("White player already taken"); }
                         Model.GameData newGameStateWhite = new Model.GameData(gameID, username, game.blackUsername(), game.gameName(), game.game());
                         gameDb.remove(game);
                         gameDb.add(newGameStateWhite);
                         break;
                     case "BLACK":
-                        if (game.blackUsername() != null) throw new AlreadyTaken("Black player already taken");
+                        if (game.blackUsername() != null) { throw new AlreadyTaken("Black player already taken"); }
                         Model.GameData newGameStateBlack = new Model.GameData(gameID, game.whiteUsername(), username, game.gameName(), game.game());
                         gameDb.remove(game);
                         gameDb.add(newGameStateBlack);
@@ -95,7 +95,7 @@ public class MemoryGameDAO implements GameDAO {
     }
 
     public void clearGameDAO() {
-        if (!gameDb.isEmpty()) gameDb.clear();
+        if (!gameDb.isEmpty()) { gameDb.clear(); }
     }
 
     private Model.PrintGameData formatGameData(Model.GameData game) {
