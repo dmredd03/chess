@@ -2,6 +2,8 @@ package model;
 
 import chess.ChessGame;
 
+import java.util.ArrayList;
+
 public class model {
     public record UserData(String username, String password, String email) {}
     public record GameData(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game) {}
@@ -15,9 +17,13 @@ public class model {
     public record LoginRequest(String username, String password) {}
     public record LoginResult(String username, String authToken) {}
 
-    // Logut records
+    // Logout records
     public record LogoutRequest(String authorization) {}
     public record LogoutResult() {}
+
+    // List Games records
+    public record ListGameRequest(String authorization) {}
+    public record ListGameResult(ArrayList<GameData> games) {}
 
     // Clear records
     public record ClearRequest() {}

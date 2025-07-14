@@ -7,6 +7,7 @@ import dataaccess.MemoryUserDAO;
 import model.model;
 import service.BadRequest;
 import service.ClearService;
+import service.GameService;
 import spark.Route;
 import spark.Request;
 import spark.Response;
@@ -37,6 +38,8 @@ public class HandlerLogic implements Route {
             newRes = LoginHandler(req, res);
         } else if (req.pathInfo().equals("/session") && "DELETE".equals(req.requestMethod())) {
             newRes = LogoutHandler(req, res);
+        } else if (req.pathInfo().equals("/game") && "GET".equals(req.requestMethod())) {
+            newRes = ListGamesHandler(req, res);
         } else {
             newRes = null;
         }
@@ -97,6 +100,22 @@ public class HandlerLogic implements Route {
             UserService service = new UserService(userDAO, authDAO, gameDAO);
             model.LogoutResult myLogoutResult = service.logout(myLogoutRequest);
             return serializer.toJson(myLogoutResult);
+        } catch (DataAccessException e) {
+            res.status(401);
+            return serializer.toJson(Map.of("message", "Error: unauthorized"));
+        } catch (Exception e) {
+            res.status(500);
+            return serializer.toJson(Map.of("message", "Error: (" + e.getMessage() + ")"));
+        }
+    }
+
+    private Object ListGamesHandler(Request req, Response res) {
+        var serializer = new Gson();
+        try {
+            model.ListGameRequest myListGameRequest = new model.ListGameRequest(req.headers("authorization"));
+            GameService service = new GameService(userDAO, authDAO, gameDAO);
+            model.ListGameResult listGameResult = service.listGames(myListGameRequest);
+            return serializer.toJson(listGameResult);
         } catch (DataAccessException e) {
             res.status(401);
             return serializer.toJson(Map.of("message", "Error: unauthorized"));

@@ -40,6 +40,7 @@ public class Server {
         Spark.post("/user", new HandlerLogic(userDAO, authDAO, gameDAO));
         Spark.post("/session", new HandlerLogic(userDAO, authDAO, gameDAO));
         Spark.delete("/session", new HandlerLogic(userDAO, authDAO, gameDAO));
+        Spark.get("/game", new HandlerLogic(userDAO, authDAO, gameDAO));
         Spark.delete("/db", new HandlerLogic(userDAO, authDAO, gameDAO));
     }
 
