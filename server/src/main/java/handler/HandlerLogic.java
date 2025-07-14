@@ -99,7 +99,7 @@ public class HandlerLogic implements Route {
             return serializer.toJson(myLogoutResult);
         } catch (DataAccessException e) {
             res.status(401);
-            return serializer.toJson(Map.of("Message", "Error: unauthorized"));
+            return serializer.toJson(Map.of("message", "Error: unauthorized"));
         } catch (Exception e) {
             res.status(500);
             return serializer.toJson(Map.of("message", "Error: (" + e.getMessage() + ")"));
