@@ -8,6 +8,7 @@ import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
 import service.UserService;
 import service.ClearService;
+import service.GameService;
 
 public class service {
     @Test
@@ -103,6 +104,50 @@ public class service {
             userService.logout(req);
         });
 
+    }
+
+    //List Game test TODO: IMPLEMENT AFTER JOIN GAME IS IMPLEMENTED
+
+    // Create Game test
+
+    @Test
+    public void testCreateGamePositive() throws Exception {
+        MemoryUserDAO userDAO = new MemoryUserDAO();
+        MemoryAuthDAO authDAO = new MemoryAuthDAO();
+        MemoryGameDAO gameDAO = new MemoryGameDAO();
+        UserService userService = new UserService(userDAO, authDAO, gameDAO);
+        model.RegisterRequest regReq = new model.RegisterRequest("david", "12345", "david@email.com");
+        userService.register(regReq);
+        model.LoginRequest loginReq = new model.LoginRequest("david", "12345");
+        model.LoginResult loginResult = userService.login(loginReq);
+
+        model.CreateGameRequest gameReq = new model.CreateGameRequest("myFirstGame");
+        model.CreateGameRequest gameReq2 = new model.CreateGameRequest("mySecondGame");
+        GameService gameService = new GameService(userDAO, authDAO, gameDAO);
+        gameService.createGame(gameReq, authDAO.getAuth(loginResult.authToken()).authToken());
+        assertDoesNotThrow(() -> {
+            gameService.createGame(gameReq2, authDAO.getAuth(loginResult.authToken()).authToken());
+        });
+    }
+
+    @Test
+    public void testCreateGameNegative() throws Exception {
+        MemoryUserDAO userDAO = new MemoryUserDAO();
+        MemoryAuthDAO authDAO = new MemoryAuthDAO();
+        MemoryGameDAO gameDAO = new MemoryGameDAO();
+        UserService userService = new UserService(userDAO, authDAO, gameDAO);
+        model.RegisterRequest regReq = new model.RegisterRequest("david", "12345", "david@email.com");
+        userService.register(regReq);
+        model.LoginRequest loginReq = new model.LoginRequest("david", "12345");
+        model.LoginResult loginResult = userService.login(loginReq);
+
+        model.CreateGameRequest gameReq = new model.CreateGameRequest("sameName");
+        model.CreateGameRequest gameReq2 = new model.CreateGameRequest("sameName");
+        GameService gameService = new GameService(userDAO, authDAO, gameDAO);
+        gameService.createGame(gameReq, authDAO.getAuth(loginResult.authToken()).authToken());
+        assertThrows(Exception.class, () -> {
+            gameService.createGame(gameReq2, authDAO.getAuth(loginResult.authToken()).authToken());
+        });
     }
 
     // User is added and then deleted, checks to make sure userDb is empty

@@ -40,8 +40,10 @@ public class HandlerLogic implements Route {
             newRes = LogoutHandler(req, res);
         } else if (req.pathInfo().equals("/game") && "GET".equals(req.requestMethod())) {
             newRes = ListGamesHandler(req, res);
+        } else if (req.pathInfo().equals("/game") && "POST".equals(req.requestMethod())){
+            newRes = CreateGameHandler(req, res);
         } else {
-            newRes = null;
+            newRes = false;
         }
 
         return newRes;
@@ -52,7 +54,7 @@ public class HandlerLogic implements Route {
         var serializer = new Gson();
         try {
             model.RegisterRequest myRequest = serializer.fromJson(req.body(), model.RegisterRequest.class);
-            BadRequestRegister(serializer, myRequest);
+            BadRequestRegister(myRequest);
             // Call service.service class to perform the requested function, passing it the request
             UserService service = new UserService(userDAO, authDAO, gameDAO);
             // Receive java response object from service.service
@@ -77,7 +79,7 @@ public class HandlerLogic implements Route {
         var serializer = new Gson();
         try {
             model.LoginRequest myLoginRequest = serializer.fromJson(req.body(), model.LoginRequest.class);
-            BadRequestLogin(serializer, myLoginRequest);
+            BadRequestLogin(myLoginRequest);
             UserService service = new UserService(userDAO, authDAO, gameDAO);
             model.LoginResult myLoginResult = service.login(myLoginRequest);
             return serializer.toJson(myLoginResult);
@@ -125,6 +127,27 @@ public class HandlerLogic implements Route {
         }
     }
 
+    private Object CreateGameHandler(Request req, Response res) {
+        var serializer = new Gson();
+        try {
+            model.CreateGameRequest myCreateGameRequest = serializer.fromJson(req.body(), model.CreateGameRequest.class);
+            BadRequestCreateGame(myCreateGameRequest);
+            String authorization = req.headers("authorization");
+            GameService service = new GameService(userDAO, authDAO, gameDAO);
+            model.CreateGameResult createResult = service.createGame(myCreateGameRequest, authorization);
+            return serializer.toJson(createResult);
+        } catch (BadRequest e) {
+            res.status(400);
+            return serializer.toJson(Map.of("message", "Error: bad request"));
+        } catch (DataAccessException e) {
+            res.status(401);
+            return serializer.toJson(Map.of("message", "Error: unauthorized"));
+        } catch (Exception e) {
+            res.status(500);
+            return serializer.toJson(Map.of("message", "Error: (" + e.getMessage() + ")"));
+        }
+    }
+
     private Object ClearHandler(Request req, Response res) {
         var serializer = new Gson();
         try {
@@ -138,7 +161,7 @@ public class HandlerLogic implements Route {
         }
     }
 // consider moving badrequest checks somewhere else?
-    private void BadRequestRegister(Gson gson, model.RegisterRequest registerRequest) throws BadRequest {
+    private void BadRequestRegister(model.RegisterRequest registerRequest) throws BadRequest {
         if (registerRequest == null ||
         registerRequest.username() == null || registerRequest.username().isBlank() ||
         registerRequest.password() == null || registerRequest.password().isBlank() ||
@@ -147,12 +170,16 @@ public class HandlerLogic implements Route {
         }
     }
 
-    private void BadRequestLogin(Gson gson, model.LoginRequest loginRequest) throws BadRequest {
+    private void BadRequestLogin(model.LoginRequest loginRequest) throws BadRequest {
         if (loginRequest == null ||
                 loginRequest.username() == null || loginRequest.username().isBlank() ||
                 loginRequest.password() == null || loginRequest.password().isBlank()) {
             throw new BadRequest("Error: bad request");
         }
+    }
+
+    private void BadRequestCreateGame(model.CreateGameRequest createGameRequest) throws BadRequest {
+        if (createGameRequest.gameName() == null || createGameRequest.gameName().isBlank()) throw new BadRequest("Error: bad request");
     }
 
 }

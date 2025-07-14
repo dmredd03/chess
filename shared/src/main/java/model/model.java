@@ -22,8 +22,13 @@ public class model {
     public record LogoutResult() {}
 
     // List Games records
+    public record printGameData(int gameID, String whiteUsername, String blackUsername, String gameName) {}
     public record ListGameRequest(String authorization) {}
-    public record ListGameResult(ArrayList<GameData> games) {}
+    public record ListGameResult(ArrayList<printGameData> games) {}
+
+    // Create Game records
+    public record CreateGameRequest(String gameName) {}
+    public record CreateGameResult(int gameID) {}
 
     // Clear records
     public record ClearRequest() {}
