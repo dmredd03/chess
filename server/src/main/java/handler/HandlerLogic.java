@@ -207,7 +207,8 @@ public class HandlerLogic implements Route {
     }
 
     private void badRequestJoinGame(Model.JoinGameRequest request) throws BadRequest {
-        if (request.playerColor() == null || (!request.playerColor().equals("WHITE") && !request.playerColor().equals("BLACK"))) throw new BadRequest("Error: bad request");
+        if (request.playerColor() == null ||
+                (!request.playerColor().equals("WHITE") && !request.playerColor().equals("BLACK"))) throw new BadRequest("Error: bad request");
         if (request.gameID() == 0) throw new BadRequest("Error: bad request");
     }
 

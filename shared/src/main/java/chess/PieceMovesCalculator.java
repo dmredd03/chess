@@ -252,30 +252,23 @@ public class PieceMovesCalculator {
     private void pawnPromotionCheck(ChessPosition testPosition) {
         ChessMove currentMove;
 
-        if (testPosition.getRow() == 8 && piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
-            currentMove = new ChessMove(startPosition, testPosition, ChessPiece.PieceType.QUEEN);
-            possibleMoves.add(currentMove);
-            currentMove = new ChessMove(startPosition, testPosition, ChessPiece.PieceType.ROOK);
-            possibleMoves.add(currentMove);
-            currentMove = new ChessMove(startPosition, testPosition, ChessPiece.PieceType.BISHOP);
-            possibleMoves.add(currentMove);
-            currentMove = new ChessMove(startPosition, testPosition, ChessPiece.PieceType.KNIGHT);
-            possibleMoves.add(currentMove);
-        } else if (testPosition.getRow() == 1 && piece.getTeamColor() == ChessGame.TeamColor.BLACK) {
-            currentMove = new ChessMove(startPosition, testPosition, ChessPiece.PieceType.QUEEN);
-            possibleMoves.add(currentMove);
-            currentMove = new ChessMove(startPosition, testPosition, ChessPiece.PieceType.ROOK);
-            possibleMoves.add(currentMove);
-            currentMove = new ChessMove(startPosition, testPosition, ChessPiece.PieceType.BISHOP);
-            possibleMoves.add(currentMove);
-            currentMove = new ChessMove(startPosition, testPosition, ChessPiece.PieceType.KNIGHT);
-            possibleMoves.add(currentMove);
+        int promotionRow = (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ? 8 : 1;
+
+        if (testPosition.getRow() == promotionRow) {
+            ChessPiece.PieceType[] promotionTypes = {
+                    ChessPiece.PieceType.QUEEN,
+                    ChessPiece.PieceType.ROOK,
+                    ChessPiece.PieceType.BISHOP,
+                    ChessPiece.PieceType.KNIGHT
+            };
+
+            for (ChessPiece.PieceType type : promotionTypes) {
+                currentMove = new ChessMove(startPosition, testPosition, type);
+                possibleMoves.add(currentMove);
+            }
         } else {
             currentMove = new ChessMove(startPosition, testPosition, null);
             possibleMoves.add(currentMove);
         }
-
     }
-
-
 }

@@ -156,40 +156,37 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        ChessPosition kingPos = getKingPosition(teamColor);
-        ChessPiece king = gameBoard.getPiece(kingPos);
-        Collection<ChessMove> kingMoves = king.pieceMoves(gameBoard, kingPos);
+        if (!isInCheck(teamColor)) { return false; }
 
-        // if not in check, not in checkmate
-        if (!isInCheck(teamColor)) return false;
-
-        // check if any movement taken could get king out of check
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
                 ChessPosition testPos = new ChessPosition(i, j);
                 ChessPiece testPiece = gameBoard.getPiece(testPos);
-                // if a piece is on my team, test where I can move it and if that move gets the king to safety
-                if (testPiece != null && testPiece.getTeamColor() == teamColor) {
-                    Collection<ChessMove> possibleMoves = testPiece.pieceMoves(gameBoard, testPos);
-                    for (ChessMove move : possibleMoves) {
-                        ChessGame currentGameState = copy();
 
-                        try {
-                            currentGameState.makeMove(move);
-                            if (isInCheck(teamColor)) return false;
+                if (testPiece == null || testPiece.getTeamColor() != teamColor) { continue; }
 
-                        } catch (InvalidMoveException e){
-                            ;
-                        }
-                        // if king is out of check, not in checkmate
-
-                    }
-                }
+                if (hasEscapeMove(testPiece, testPos, teamColor)) { return false; }
             }
         }
 
-
         return true;
+    }
+
+    private boolean hasEscapeMove(ChessPiece testPiece, ChessPosition testPos, TeamColor teamColor) {
+        Collection<ChessMove> possibleMoves = testPiece.pieceMoves(gameBoard, testPos);
+        for (ChessMove move : possibleMoves) {
+            ChessGame currentGameState = copy();
+
+            try {
+                currentGameState.makeMove(move);
+                if (!currentGameState.isInCheck(teamColor)) return true;
+
+            } catch (InvalidMoveException e){
+                ;
+            }
+            // if king is out of check, not in checkmate
+        }
+        return false;
     }
 
     public ChessGame copy() {
@@ -277,69 +274,64 @@ public class ChessGame {
     }
 
     private boolean inDanger(ChessPosition testPosition, TeamColor testTeamColor) {
-        boolean isInDanger = false;
-        // check every position for validMoves, if they have endPosition at testPosition, isInDanger
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
                 ChessPosition possiblePosition = new ChessPosition(i, j);
                 ChessPiece possiblePiece = gameBoard.getPiece(possiblePosition);
-                if (possiblePiece != null && possiblePiece.getTeamColor() != testTeamColor) {
-                    // adds all possible moves
-                    Collection<ChessMove> possibleMoves = possiblePiece.pieceMoves(gameBoard, possiblePosition);
-                    // adds pawn attacks
-                    if (testTeamColor == TeamColor.WHITE) {
-                        possibleMoves.addAll(pawnAttackPrediction(TeamColor.BLACK));
-                    } else {
-                        possibleMoves.addAll(pawnAttackPrediction(TeamColor.WHITE));
-                    }
 
-                    for (ChessMove testMove : possibleMoves) {
-                        if (testMove.getEndPosition().equals(testPosition)) {
-                            isInDanger = true;
-                        }
+                if (possiblePiece == null || possiblePiece.getTeamColor() == testTeamColor) { continue; }
+
+                Collection<ChessMove> possibleMoves = getThreatMoves(possiblePiece, possiblePosition, testTeamColor);
+
+                for (ChessMove move : possibleMoves) {
+                    if (move.getEndPosition().equals(testPosition)) {
+                        return true;
                     }
                 }
             }
         }
-        return isInDanger;
+        return false;
+    }
+
+    private Collection<ChessMove> getThreatMoves(ChessPiece testPiece, ChessPosition testPos, TeamColor targetTeamColor) {
+        Collection<ChessMove> moves = new ArrayList<>(testPiece.pieceMoves(gameBoard, testPos));
+        TeamColor enemyColor = (targetTeamColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
+        moves.addAll(pawnAttackPrediction(enemyColor));
+        return moves;
     }
 
     private Collection<ChessMove> pawnAttackPrediction(TeamColor testTeamColor) {
         Collection<ChessMove> pawnAttacks = new ArrayList<>();
+        int direction = (testTeamColor == TeamColor.WHITE) ? 1 : -1;
+
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
                 ChessPosition testPos = new ChessPosition(i, j);
                 ChessPiece testPawn = gameBoard.getPiece(testPos);
-                if (testPawn != null && testPawn.getTeamColor() == testTeamColor && testPawn.getPieceType() == ChessPiece.PieceType.PAWN) {
-                    // Adds attack checks, doesn't worry about promotion or anything else, used to calculate danger for other pieces
-                    if (testPos.getColumn() > 1) {
-                        if (testTeamColor == TeamColor.WHITE) {
-                            ChessPosition leftAttackPos = new ChessPosition(testPos.getRow() + 1, testPos.getColumn() - 1);
-                            ChessMove leftAttack = new ChessMove(testPos, leftAttackPos, null);
-                            pawnAttacks.add(leftAttack);
-                        } else {
-                            ChessPosition leftAttackPos = new ChessPosition(testPos.getRow() - 1, testPos.getColumn() - 1);
-                            ChessMove leftAttack = new ChessMove(testPos, leftAttackPos, null);
-                            pawnAttacks.add(leftAttack);
-                        }
-                    }
 
-                    if (testPos.getColumn() < 8) {
-                        if (testTeamColor == TeamColor.WHITE) {
-                            ChessPosition rightAttackPos = new ChessPosition(testPos.getRow() + 1, testPos.getColumn() + 1);
-                            ChessMove rightAttack = new ChessMove(testPos, rightAttackPos, null);
-                            pawnAttacks.add(rightAttack);
-                        } else {
-                            ChessPosition rightAttackPos = new ChessPosition(testPos.getRow() - 1, testPos.getColumn() + 1);
-                            ChessMove rightAttack = new ChessMove(testPos, rightAttackPos, null);
-                            pawnAttacks.add(rightAttack);
-                        }
-                    }
+                if (testPawn == null || testPawn.getTeamColor() != testTeamColor || testPawn.getPieceType() != ChessPiece.PieceType.PAWN) {
+                    continue;
+                }
+
+                if (j > 1) {
+                    addAttackMoveIfInBounds(pawnAttacks, testPos, direction, -1);
+                }
+                if (j < 8) {
+                    addAttackMoveIfInBounds(pawnAttacks, testPos, direction, 1);
                 }
             }
         }
 
         return pawnAttacks;
+    }
+
+    private void addAttackMoveIfInBounds(Collection<ChessMove> attacks, ChessPosition from, int rowDir, int colDir) {
+        int newRow = from.getRow() + rowDir;
+        int newCol = from.getColumn() + colDir;
+
+        if (newRow >= 1 && newRow <= 8 && newCol >= 1 && newCol <= 8) {
+            attacks.add(new ChessMove(from, new ChessPosition(newRow, newCol), null));
+        }
     }
 
     @Override
