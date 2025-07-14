@@ -35,6 +35,8 @@ public class HandlerLogic implements Route {
             newRes = ClearHandler(req, res);
         } else if (req.pathInfo().equals("/session") && "POST".equals(req.requestMethod())) {
             newRes = LoginHandler(req, res);
+        } else if (req.pathInfo().equals("/session") && "DELETE".equals(req.requestMethod())) {
+            newRes = LogoutHandler(req, res);
         } else {
             newRes = null;
         }
@@ -82,6 +84,22 @@ public class HandlerLogic implements Route {
         } catch (DataAccessException e) {
             res.status(401);
             return serializer.toJson(Map.of("message", "Error: unauthorized"));
+        } catch (Exception e) {
+            res.status(500);
+            return serializer.toJson(Map.of("message", "Error: (" + e.getMessage() + ")"));
+        }
+    }
+
+    private Object LogoutHandler(Request req, Response res) {
+        var serializer = new Gson();
+        try {
+            model.LogoutRequest myLogoutRequest = new model.LogoutRequest(req.headers("authorization"));
+            UserService service = new UserService(userDAO, authDAO, gameDAO);
+            model.LogoutResult myLogoutResult = service.logout(myLogoutRequest);
+            return serializer.toJson(myLogoutResult);
+        } catch (DataAccessException e) {
+            res.status(401);
+            return serializer.toJson(Map.of("Message", "Error: unauthorized"));
         } catch (Exception e) {
             res.status(500);
             return serializer.toJson(Map.of("message", "Error: (" + e.getMessage() + ")"));

@@ -26,6 +26,7 @@ public class MemoryAuthDAO implements AuthDAO {
         for ( model.AuthData currAuthData : authDb ) {
             if (currAuthData.authToken().equals(authToken)) {
                 authDb.remove(currAuthData);
+                return;
             }
         }
         throw new DataAccessException("authorization not found");

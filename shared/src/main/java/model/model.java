@@ -15,6 +15,10 @@ public class model {
     public record LoginRequest(String username, String password) {}
     public record LoginResult(String username, String authToken) {}
 
+    // Logut records
+    public record LogoutRequest(String authorization) {}
+    public record LogoutResult() {}
+
     // Clear records
     public record ClearRequest() {}
     public record ClearResult() {}

@@ -1,4 +1,5 @@
 // THIS IS FOR TEST
+import dataaccess.DataAccessException;
 import model.model;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -72,6 +73,36 @@ public class service {
         assertThrows(Exception.class, () -> {
             userService.login(loginReq);
         });
+    }
+
+    //Logout test
+    @Test
+    public void testLogoutPositive() throws Exception {
+        MemoryUserDAO userDAO = new MemoryUserDAO();
+        MemoryAuthDAO authDAO = new MemoryAuthDAO();
+        MemoryGameDAO gameDAO = new MemoryGameDAO();
+        UserService userService = new UserService(userDAO, authDAO, gameDAO);
+        model.RegisterRequest regReq = new model.RegisterRequest("david", "12345", "david@email.com");
+        model.RegisterResult regResult = userService.register(regReq);
+
+        model.LogoutRequest req = new model.LogoutRequest(regResult.authToken());
+        assertDoesNotThrow(() -> userService.logout(req));
+    }
+
+    @Test
+    public void testLogoutNegative() throws Exception {
+        MemoryUserDAO userDAO = new MemoryUserDAO();
+        MemoryAuthDAO authDAO = new MemoryAuthDAO();
+        MemoryGameDAO gameDAO = new MemoryGameDAO();
+        UserService userService = new UserService(userDAO, authDAO, gameDAO);
+        model.RegisterRequest regReq = new model.RegisterRequest("david", "12345", "david@email.com");
+        userService.register(regReq);
+
+        assertThrows(DataAccessException.class, () -> {
+            model.LogoutRequest req = new model.LogoutRequest("1234567890BadAuth");
+            userService.logout(req);
+        });
+
     }
 
     // User is added and then deleted, checks to make sure userDb is empty

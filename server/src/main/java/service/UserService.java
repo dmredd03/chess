@@ -49,5 +49,11 @@ public class UserService {
 
         return new model.LoginResult(loginUser.username(), myAuthToken);
     }
+
+    public model.LogoutResult logout(model.LogoutRequest logoutRequest) throws DataAccessException {
+        model.AuthData myAuthToken = authDAO.getAuth(logoutRequest.authorization()); // throws unauthorized exception if not found
+        authDAO.deleteAuth(myAuthToken.authToken());
+        return new model.LogoutResult();
+    }
 }
 
