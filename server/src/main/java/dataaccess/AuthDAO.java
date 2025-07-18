@@ -8,3 +8,6 @@ public interface AuthDAO {
     String getUserByAuth(String authToken) throws DataAccessException;
     void clearAuthDAO();
 }
+
+// Table: AuthKey, username, NOT NULL
+// Primary Key: AuthKey, foreign Key: username

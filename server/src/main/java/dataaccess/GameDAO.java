@@ -11,3 +11,7 @@ public interface GameDAO {
     void updateGame(String playerColor, String username, int gameID);
     void clearGameDAO();
 }
+
+// Table:
+// gameID, game, gameName, NOT NULL & whiteUsername, blackUsername, can be null
+// Primary Key: gameID
