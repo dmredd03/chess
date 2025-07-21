@@ -128,5 +128,88 @@ public class DataAccessTests {
         }
     }
 
+    //AuthSQLDAO tests
+
+    // CreateAuth tests
+    @Test
+    public void createAuthPositive() throws Exception {
+        assertDoesNotThrow(() -> {
+            authSQL.createAuth("newUser");
+        });
+    }
+
+    @Test
+    public void createAuthNegative() throws Exception {
+        authSQL.createAuth("user");
+        assertThrows(DataAccessException.class, () -> {
+           authSQL.createAuth("user"); // line already exists
+        });
+    }
+
+    // GetAuth tests
+    @Test
+    public void getAuthPositive() throws Exception {
+        String myAuthToken = authSQL.createAuth("newUser");
+        Model.AuthData testAuthData = new Model.AuthData(myAuthToken, "newUser");
+        assertEquals(testAuthData, authSQL.getAuth(myAuthToken));
+    }
+
+    @Test
+    public void getAuthNegative() throws Exception {
+        String myAuthToken = authSQL.createAuth("newUser");
+        assertThrows(DataAccessException.class, () -> {
+           authSQL.getAuth(myAuthToken + "badAuth");
+        });
+    }
+
+    // deleteAuth tests
+    @Test
+    public void deleteAuthPositive() throws Exception {
+        String myAuthToken = authSQL.createAuth("newUser");
+        assertDoesNotThrow(() -> authSQL.deleteAuth(myAuthToken));
+    }
+
+    @Test
+    public void deleteAuthNegative() throws Exception {
+        String myAuthToken = authSQL.createAuth("newUser");
+        Model.AuthData testAuthData = authSQL.getAuth(myAuthToken);
+        authSQL.deleteAuth(myAuthToken);
+        assertThrows(DataAccessException.class, () -> authSQL.deleteAuth(myAuthToken));
+    }
+
+    // getUserByAuth tests
+    @Test
+    public void getUserByAuthPositive() throws Exception {
+        String myAuthToken = authSQL.createAuth("newUser");
+        Model.AuthData testAuthData = authSQL.getAuth(myAuthToken);
+        assertDoesNotThrow(() -> authSQL.getUserByAuth(myAuthToken));
+    }
+
+    @Test
+    public void getUserByAuthNegative() throws Exception {
+        String myAuthToken = authSQL.createAuth("newUser");
+        authSQL.deleteAuth(myAuthToken);
+        assertThrows(DataAccessException.class, () -> authSQL.getUserByAuth(myAuthToken));
+    }
+
+    // Clear Auth DAO test
+    @Test
+    public void clearAuthDAOPositive() throws Exception {
+        authSQL.createAuth("newUser");
+        authSQL.createAuth("newUser2");
+        authSQL.createAuth("newUser3");
+
+        authSQL.clearAuthDAO();
+        try (var conn = DatabaseManager.getConnection()) {
+            var ps = conn.prepareStatement("SELECT COUNT(*) FROM authData");
+            var rs = ps.executeQuery();
+            if (rs.next()) {
+                int count = rs.getInt(1);
+                assertEquals(0, count, "Table should be empty");
+            } else {
+                fail("not empty");
+            }
+        }
+    }
 
 }
