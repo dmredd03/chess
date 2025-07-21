@@ -74,7 +74,7 @@ public class UserSQLDAO implements UserDAO {
         }
     }
 
-    private void storeUserPassword(String usermane, String clearTextPassword) {
+    private void storeUserPassword(String username, String clearTextPassword) {
         String hashedPassword = BCrypt.hashpw(clearTextPassword, BCrypt.gensalt());
     }
 

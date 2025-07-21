@@ -2,6 +2,8 @@ package dataaccess;
 
 import model.Model;
 
+import java.sql.SQLException;
+
 public class AuthSQLDAO implements AuthDAO {
 
     public String createAuth(String username) {
@@ -20,7 +22,25 @@ public class AuthSQLDAO implements AuthDAO {
         return null;
     }
 
-    public void clearAuthDAO() {
+    String authTableCreation = """
+            CREATE TABLE IF NOT EXISTS  authData (
+            authToken varchar(256) NOT NULL PRIMARY KEY,
+            username varchar(256) NOT NULL
+            )
+            """;
 
+    public void clearAuthDAO() {
+        try (var conn = DatabaseManager.getConnection()) {
+            String drop = "DROP TABLE authData";
+            try (var dropStatement = conn.prepareStatement(drop)) {
+                var createStatement = conn.prepareStatement(authTableCreation);
+                dropStatement.executeUpdate();
+                createStatement.executeUpdate();
+            }
+        } catch (DataAccessException e) {
+            return ;
+        } catch (SQLException e) {
+            return ;
+        }
     }
 }

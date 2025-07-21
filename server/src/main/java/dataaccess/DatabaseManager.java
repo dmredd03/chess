@@ -103,7 +103,6 @@ public class DatabaseManager {
     };
 
     static public void configTables() throws DataAccessException {
-        createDatabase();
         try (var conn = getConnection()) {
             for (var statement : createStatements) {
                 try (var preparedStatement = conn.prepareStatement(statement)) {

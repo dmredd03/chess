@@ -1,18 +1,16 @@
 package service;// THIS IS FOR TEST
-import dataaccess.DataAccessException;
+import dataaccess.*;
 import model.Model;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
-import dataaccess.MemoryUserDAO;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
+
 
 public class ServiceTests {
     @Test
     public void testRegisterPositive() throws Exception {
-        MemoryUserDAO userDAO = new MemoryUserDAO();
-        MemoryAuthDAO authDAO = new MemoryAuthDAO();
-        MemoryGameDAO gameDAO = new MemoryGameDAO();
+        UserSQLDAO userDAO = new UserSQLDAO();
+        AuthSQLDAO authDAO = new AuthSQLDAO();
+        GameSQLDAO gameDAO = new GameSQLDAO();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
 
         Model.RegisterRequest req = new Model.RegisterRequest("david", "12345", "david@email.com");
@@ -28,9 +26,9 @@ public class ServiceTests {
 
     @Test
     public void testRegisterNegative() throws Exception {
-        MemoryUserDAO userDAO = new MemoryUserDAO();
-        MemoryAuthDAO authDAO = new MemoryAuthDAO();
-        MemoryGameDAO gameDAO = new MemoryGameDAO();
+        UserSQLDAO userDAO = new UserSQLDAO();
+        AuthSQLDAO authDAO = new AuthSQLDAO();
+        GameSQLDAO gameDAO = new GameSQLDAO();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
 
         Model.RegisterRequest req = new Model.RegisterRequest("david", "12345", "david@email.com");
@@ -44,9 +42,9 @@ public class ServiceTests {
     //Login tests
     @Test
     public void testLoginPositive() throws Exception {
-        MemoryUserDAO userDAO = new MemoryUserDAO();
-        MemoryAuthDAO authDAO = new MemoryAuthDAO();
-        MemoryGameDAO gameDAO = new MemoryGameDAO();
+        UserSQLDAO userDAO = new UserSQLDAO();
+        AuthSQLDAO authDAO = new AuthSQLDAO();
+        GameSQLDAO gameDAO = new GameSQLDAO();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
 
         Model.RegisterRequest regReq = new Model.RegisterRequest("david", "12345", "david@email.com");
@@ -60,9 +58,9 @@ public class ServiceTests {
 
     @Test
     public void testLoginNegative() throws Exception {
-        MemoryUserDAO userDAO = new MemoryUserDAO();
-        MemoryAuthDAO authDAO = new MemoryAuthDAO();
-        MemoryGameDAO gameDAO = new MemoryGameDAO();
+        UserSQLDAO userDAO = new UserSQLDAO();
+        AuthSQLDAO authDAO = new AuthSQLDAO();
+        GameSQLDAO gameDAO = new GameSQLDAO();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
 
         Model.RegisterRequest regReq = new Model.RegisterRequest("david", "12345", "david@email.com");
@@ -76,9 +74,9 @@ public class ServiceTests {
     //Logout test
     @Test
     public void testLogoutPositive() throws Exception {
-        MemoryUserDAO userDAO = new MemoryUserDAO();
-        MemoryAuthDAO authDAO = new MemoryAuthDAO();
-        MemoryGameDAO gameDAO = new MemoryGameDAO();
+        UserSQLDAO userDAO = new UserSQLDAO();
+        AuthSQLDAO authDAO = new AuthSQLDAO();
+        GameSQLDAO gameDAO = new GameSQLDAO();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
         Model.RegisterRequest regReq = new Model.RegisterRequest("david", "12345", "david@email.com");
         Model.RegisterResult regResult = userService.register(regReq);
@@ -89,9 +87,9 @@ public class ServiceTests {
 
     @Test
     public void testLogoutNegative() throws Exception {
-        MemoryUserDAO userDAO = new MemoryUserDAO();
-        MemoryAuthDAO authDAO = new MemoryAuthDAO();
-        MemoryGameDAO gameDAO = new MemoryGameDAO();
+        UserSQLDAO userDAO = new UserSQLDAO();
+        AuthSQLDAO authDAO = new AuthSQLDAO();
+        GameSQLDAO gameDAO = new GameSQLDAO();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
         Model.RegisterRequest regReq = new Model.RegisterRequest("david", "12345", "david@email.com");
         userService.register(regReq);
@@ -107,9 +105,9 @@ public class ServiceTests {
 
     @Test
     public void testListGamePositive() throws Exception {
-        MemoryUserDAO userDAO = new MemoryUserDAO();
-        MemoryAuthDAO authDAO = new MemoryAuthDAO();
-        MemoryGameDAO gameDAO = new MemoryGameDAO();
+        UserSQLDAO userDAO = new UserSQLDAO();
+        AuthSQLDAO authDAO = new AuthSQLDAO();
+        GameSQLDAO gameDAO = new GameSQLDAO();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
         Model.RegisterRequest regReq = new Model.RegisterRequest("david", "12345", "david@email.com");
         userService.register(regReq);
@@ -129,9 +127,9 @@ public class ServiceTests {
 
     @Test
     public void testListGameNegative() throws Exception {
-        MemoryUserDAO userDAO = new MemoryUserDAO();
-        MemoryAuthDAO authDAO = new MemoryAuthDAO();
-        MemoryGameDAO gameDAO = new MemoryGameDAO();
+        UserSQLDAO userDAO = new UserSQLDAO();
+        AuthSQLDAO authDAO = new AuthSQLDAO();
+        GameSQLDAO gameDAO = new GameSQLDAO();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
         Model.RegisterRequest regReq = new Model.RegisterRequest("david", "12345", "david@email.com");
         userService.register(regReq);
@@ -153,9 +151,9 @@ public class ServiceTests {
 
     @Test
     public void testCreateGamePositive() throws Exception {
-        MemoryUserDAO userDAO = new MemoryUserDAO();
-        MemoryAuthDAO authDAO = new MemoryAuthDAO();
-        MemoryGameDAO gameDAO = new MemoryGameDAO();
+        UserSQLDAO userDAO = new UserSQLDAO();
+        AuthSQLDAO authDAO = new AuthSQLDAO();
+        GameSQLDAO gameDAO = new GameSQLDAO();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
         Model.RegisterRequest regReq = new Model.RegisterRequest("david", "12345", "david@email.com");
         userService.register(regReq);
@@ -173,9 +171,9 @@ public class ServiceTests {
 
     @Test
     public void testCreateGameNegative() throws Exception {
-        MemoryUserDAO userDAO = new MemoryUserDAO();
-        MemoryAuthDAO authDAO = new MemoryAuthDAO();
-        MemoryGameDAO gameDAO = new MemoryGameDAO();
+        UserSQLDAO userDAO = new UserSQLDAO();
+        AuthSQLDAO authDAO = new AuthSQLDAO();
+        GameSQLDAO gameDAO = new GameSQLDAO();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
         Model.RegisterRequest regReq = new Model.RegisterRequest("david", "12345", "david@email.com");
         userService.register(regReq);
@@ -194,9 +192,9 @@ public class ServiceTests {
     //Join Game test
     @Test
     public void joinGamePositive() throws Exception {
-        MemoryUserDAO userDAO = new MemoryUserDAO();
-        MemoryAuthDAO authDAO = new MemoryAuthDAO();
-        MemoryGameDAO gameDAO = new MemoryGameDAO();
+        UserSQLDAO userDAO = new UserSQLDAO();
+        AuthSQLDAO authDAO = new AuthSQLDAO();
+        GameSQLDAO gameDAO = new GameSQLDAO();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
         Model.RegisterRequest regReq = new Model.RegisterRequest("david", "12345", "david@email.com");
         userService.register(regReq);
@@ -229,9 +227,9 @@ public class ServiceTests {
 
     @Test
     public void joinGameNegative() throws Exception {
-        MemoryUserDAO userDAO = new MemoryUserDAO();
-        MemoryAuthDAO authDAO = new MemoryAuthDAO();
-        MemoryGameDAO gameDAO = new MemoryGameDAO();
+        UserSQLDAO userDAO = new UserSQLDAO();
+        AuthSQLDAO authDAO = new AuthSQLDAO();
+        GameSQLDAO gameDAO = new GameSQLDAO();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
         Model.RegisterRequest regReq = new Model.RegisterRequest("david", "12345", "david@email.com");
         userService.register(regReq);
@@ -265,9 +263,9 @@ public class ServiceTests {
     // User is added and then deleted, checks to make sure userDb is empty
     @Test
     public void clearPositive() throws Exception {
-        MemoryUserDAO userDAO = new MemoryUserDAO();
-        MemoryAuthDAO authDAO = new MemoryAuthDAO();
-        MemoryGameDAO gameDAO = new MemoryGameDAO();
+        UserSQLDAO userDAO = new UserSQLDAO();
+        AuthSQLDAO authDAO = new AuthSQLDAO();
+        GameSQLDAO gameDAO = new GameSQLDAO();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
         ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
         Model.RegisterRequest req = new Model.RegisterRequest("david", "12345", "david@email.com");

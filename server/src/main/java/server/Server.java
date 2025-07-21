@@ -1,6 +1,7 @@
 package server;
 
 import dataaccess.*;
+import org.eclipse.jetty.server.Authentication;
 import spark.*;
 import handler.HandlerLogic;
 
