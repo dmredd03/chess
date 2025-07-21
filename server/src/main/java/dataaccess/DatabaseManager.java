@@ -27,6 +27,7 @@ public class DatabaseManager {
         } catch (SQLException ex) {
             throw new DataAccessException("failed to create database", ex);
         }
+        configTables();
     }
 
     /**
@@ -73,5 +74,44 @@ public class DatabaseManager {
         var host = props.getProperty("db.host");
         var port = Integer.parseInt(props.getProperty("db.port"));
         connectionUrl = String.format("jdbc:mysql://%s:%d", host, port);
+    }
+
+    private static final String[] createStatements = {
+            """
+            CREATE TABLE IF NOT EXISTS  userData (
+            id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            username varchar(256) NOT NULL,
+            password varchar(256) NOT NULL,
+            email varchar(256) NOT NULL
+            )
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS  authData (
+            authToken varchar(256) NOT NULL PRIMARY KEY,
+            username varchar(256) NOT NULL
+            )
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS  gameData (
+            gameID int NOT NULL PRIMARY KEY,
+            whiteUsername varchar(256) DEFAULT NULL,
+            blackUsername varchar(256) DEFAULT NULL,
+            gameName varchar(256) NOT NULL,
+            game TEXT NOT NULL
+            )
+            """
+    };
+
+    static public void configTables() throws DataAccessException {
+        createDatabase();
+        try (var conn = getConnection()) {
+            for (var statement : createStatements) {
+                try (var preparedStatement = conn.prepareStatement(statement)) {
+                    preparedStatement.executeUpdate();
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Unable to configure database and tables", e);
+        }
     }
 }

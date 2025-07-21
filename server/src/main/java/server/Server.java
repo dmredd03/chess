@@ -1,16 +1,14 @@
 package server;
 
-import dataaccess.MemoryGameDAO;
+import dataaccess.*;
 import spark.*;
-import dataaccess.MemoryUserDAO;
-import dataaccess.MemoryAuthDAO;
 import handler.HandlerLogic;
 
 
 public class Server {
-    private MemoryUserDAO userDAO;
-    private MemoryAuthDAO authDAO;
-    private MemoryGameDAO gameDAO;
+    private UserSQLDAO userDAO;
+    private AuthSQLDAO authDAO;
+    private GameSQLDAO gameDAO;
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
@@ -18,9 +16,14 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // initialize db
-        userDAO = new MemoryUserDAO();
-        authDAO = new MemoryAuthDAO();
-        gameDAO = new MemoryGameDAO();
+        try {
+            DatabaseManager.createDatabase();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        userDAO = new UserSQLDAO();
+        authDAO = new AuthSQLDAO();
+        gameDAO = new GameSQLDAO();
 
         // Register your endpoints and handle exceptions here.
         createRoutes();

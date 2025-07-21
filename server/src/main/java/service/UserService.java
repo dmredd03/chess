@@ -1,18 +1,15 @@
 package service;
-import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.*;
 
 import model.Model;
 
 
 public class UserService {
-    private MemoryUserDAO userDAO;
-    private MemoryAuthDAO authDAO;
-    private MemoryGameDAO gameDAO;
+    private UserSQLDAO userDAO;
+    private AuthSQLDAO authDAO;
+    private GameSQLDAO gameDAO;
 
-    public UserService(MemoryUserDAO userDAO, MemoryAuthDAO authDAO, MemoryGameDAO gameDAO) {
+    public UserService(UserSQLDAO userDAO, AuthSQLDAO authDAO, GameSQLDAO gameDAO) {
         this.userDAO = userDAO;
         this.authDAO = authDAO;
         this.gameDAO = gameDAO;

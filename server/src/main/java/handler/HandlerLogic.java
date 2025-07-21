@@ -1,9 +1,6 @@
 package handler;
 
-import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.*;
 import model.Model;
 import service.*;
 import spark.Route;
@@ -14,11 +11,11 @@ import com.google.gson.Gson;
 import java.util.Map;
 
 public class HandlerLogic implements Route {
-    private MemoryUserDAO userDAO;
-    private MemoryAuthDAO authDAO;
-    private MemoryGameDAO gameDAO;
+    private UserSQLDAO userDAO;
+    private AuthSQLDAO authDAO;
+    private GameSQLDAO gameDAO;
 
-    public HandlerLogic(MemoryUserDAO userDAO, MemoryAuthDAO authDAO, MemoryGameDAO gameDAO) {
+    public HandlerLogic(UserSQLDAO userDAO, AuthSQLDAO authDAO, GameSQLDAO gameDAO) {
         this.userDAO = userDAO;
         this.authDAO = authDAO;
         this.gameDAO = gameDAO;
