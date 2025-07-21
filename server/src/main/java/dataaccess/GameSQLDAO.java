@@ -39,11 +39,9 @@ public class GameSQLDAO implements GameDAO {
 
     public void clearGameDAO() {
         try (var conn = DatabaseManager.getConnection()) {
-            String drop = "DROP TABLE gameData";
+            String drop = "TRUNCATE TABLE gameData";
             try (var dropStatement = conn.prepareStatement(drop)) {
-                var createStatement = conn.prepareStatement(gameTableCreation);
                 dropStatement.executeUpdate();
-                createStatement.executeUpdate();
             }
         } catch (DataAccessException e) {
             return ;

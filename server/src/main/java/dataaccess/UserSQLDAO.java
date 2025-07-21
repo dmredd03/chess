@@ -14,8 +14,10 @@ public class UserSQLDAO implements UserDAO {
     }
 
     public Model.UserData getUser(String username) throws DataAccessException {
+        if (!userExists(username)) { return null; }
+
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT username FROM getUser WHERE getUser=?";
+            var statement = "SELECT username, password, email FROM userData WHERE username = ?";
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setString(1, username);
 
@@ -31,29 +33,52 @@ public class UserSQLDAO implements UserDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Error retrieving user", e);
+            return null;
         }
     }
 
-    public void createUser(Model.UserData newUsername) {
+    public void createUser(Model.UserData newUsername) throws DataAccessException {
+        if (userExists(newUsername.username())) { throw new DataAccessException("User already exists"); }
 
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "INSERT INTO userData (username, password, email) VALUES (?, ?, ?)";
+            var ps = conn.prepareStatement(statement);
+
+            ps.setString(1, newUsername.username());
+            ps.setString(2, hashPassword(newUsername.password()));
+            ps.setString(3, newUsername.email());
+
+            ps.executeUpdate();
+
+        } catch (SQLException | DataAccessException e) {
+            throw new DataAccessException("User already exists", e);
+        }
     }
 
-    public Boolean matchingPassword(Model.UserData user) {
-        /*if (userDb.isEmpty()) { return false; }
-        for (Model.UserData testUser : userDb) {
-            if (testUser.password().equals(user.password()) && testUser.username().equals(user.username())) {
-                return true;
+    public Boolean matchingPassword(Model.UserData user) throws DataAccessException {
+        if (!userExists(user.username())) { throw new DataAccessException("User doesn't exists"); }
+
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT password FROM userData WHERE username = ?";
+            var ps = conn.prepareStatement(statement);
+            ps.setString(1, user.username());
+            try (var rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String hashedPW = rs.getString("password");
+                    return BCrypt.checkpw(user.password(), hashedPW);
+                } else {
+                    throw new DataAccessException("Access error");
+                }
             }
+        } catch (SQLException e) {
+            throw new DataAccessException("Access error");
         }
-        return false;
-        return null;*/
-        return false;
     }
+
+
 
     String userTable = """
                         CREATE TABLE IF NOT EXISTS  userData (
-                        id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
                         username varchar(256) NOT NULL,
                         password varchar(256) NOT NULL,
                         email varchar(256) NOT NULL
@@ -61,21 +86,33 @@ public class UserSQLDAO implements UserDAO {
                         """;
     public void clearUserDAO() {
         try (var conn = DatabaseManager.getConnection()) {
-            String drop = "DROP TABLE userData";
+            String drop = "TRUNCATE TABLE userData";
             try (var dropStatement = conn.prepareStatement(drop)) {
-                var createStatement = conn.prepareStatement(userTable);
                 dropStatement.executeUpdate();
-                createStatement.executeUpdate();
             }
-        } catch (DataAccessException e) {
-            return ;
-        } catch (SQLException e) {
+        } catch (DataAccessException | SQLException e) {
             return ;
         }
     }
 
-    private void storeUserPassword(String username, String clearTextPassword) {
-        String hashedPassword = BCrypt.hashpw(clearTextPassword, BCrypt.gensalt());
+    private String hashPassword(String clearTextPassword) {
+        return BCrypt.hashpw(clearTextPassword, BCrypt.gensalt());
+    }
+
+    private boolean userExists (String username) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT username FROM userData WHERE username = ?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, username);
+
+                try (var rs = ps.executeQuery()) {
+                    return rs.next(); //true, false
+                }
+            }
+        } catch (DataAccessException | SQLException e) {
+            // user doesn't exist, return false
+            throw new DataAccessException("User doesn't exist");
+        }
     }
 
 }

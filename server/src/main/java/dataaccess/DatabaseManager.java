@@ -79,8 +79,7 @@ public class DatabaseManager {
     private static final String[] createStatements = {
             """
             CREATE TABLE IF NOT EXISTS  userData (
-            id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
-            username varchar(256) NOT NULL,
+            username varchar(256) NOT NULL PRIMARY KEY,
             password varchar(256) NOT NULL,
             email varchar(256) NOT NULL
             )
@@ -93,7 +92,6 @@ public class DatabaseManager {
             """,
             """
             CREATE TABLE IF NOT EXISTS  gameData (
-            gameID int NOT NULL PRIMARY KEY,
             whiteUsername varchar(256) DEFAULT NULL,
             blackUsername varchar(256) DEFAULT NULL,
             gameName varchar(256) NOT NULL,
