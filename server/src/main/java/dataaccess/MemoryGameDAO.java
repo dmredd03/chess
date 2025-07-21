@@ -11,9 +11,6 @@ import java.util.Random;
 public class MemoryGameDAO implements GameDAO {
     private ArrayList<Model.GameData> gameDb = new ArrayList<>();
 
-    public void clear() {
-        gameDb.clear();
-    }
 
     public int createGame(String gameName) throws DataAccessException {
         for ( Model.GameData game : gameDb ) {
