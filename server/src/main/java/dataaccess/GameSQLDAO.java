@@ -3,7 +3,10 @@ package dataaccess;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import model.Model;
+import service.AlreadyTaken;
 
+import javax.xml.crypto.Data;
+import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -67,12 +70,66 @@ public class GameSQLDAO implements GameDAO {
         return new Model.GameData(gameID, whiteUsername, blackUsername, gameName, chessGame);
     }
 
-    public ArrayList<Model.PrintGameData> listGame() {
-        return null;
+    public ArrayList<Model.PrintGameData> listGame() throws DataAccessException {
+        ArrayList<Model.PrintGameData> formattedGameList = new ArrayList<>();
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM gameData";
+            var ps = conn.prepareStatement(statement);
+            var rs = ps.executeQuery();
+            while (rs.next()) {
+                int gameID = rs.getInt("gameID");
+                Model.GameData rowData = readGameData(gameID, rs);
+
+                formattedGameList.add(new Model.PrintGameData(gameID,
+                        rowData.whiteUsername(),
+                        rowData.blackUsername(),
+                        rowData.gameName()));
+            }
+
+            return formattedGameList;
+        } catch (SQLException | DataAccessException e) {
+            throw new DataAccessException("SQL bad");
+        }
     }
 
-    public void updateGame(String playerColor, String username, int gameID) {
+    public void updateGame(String playerColor, String username, int gameID) throws AlreadyTaken {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT whiteUsername, blackUsername FROM gameData WHERE gameID = ?";
+            var ps = conn.prepareStatement(statement);
+            ps.setInt(1, gameID);
+            try ( var rs = ps.executeQuery() ) {
+                if (rs.next()) {
+                    String whiteUsername = rs.getString("whiteUsername");
+                    String blackUsername = rs.getString("blackUsername");
+                    var newStatement = "UPDATE gameData"; // placeholder
+                    switch (playerColor) {
+                        case "WHITE":
+                            if (whiteUsername != null) { throw new AlreadyTaken("White player already taken"); }
+                            newStatement = "UPDATE gameData SET whiteUsername = ? WHERE gameID = ?";
 
+                            break;
+                        case "BLACK":
+                            if (blackUsername != null) { throw new AlreadyTaken("Black player already taken"); }
+                            newStatement = "UPDATE gameData SET blackUsername = ? WHERE gameID = ?";
+
+                            break;
+                        default:
+                            throw new AlreadyTaken("update failed");
+                    }
+
+                    try (var newPs = conn.prepareStatement(newStatement)) {
+                        newPs.setString(1, username);
+                        newPs.setInt(2, gameID);
+                        newPs.executeUpdate();
+                    }
+                } else {
+                    throw new DataAccessException("Game not found");
+                }
+            }
+
+        } catch (SQLException | DataAccessException e) {
+            throw new AlreadyTaken("update failed");
+        }
     }
 
     String gameTableCreation = """

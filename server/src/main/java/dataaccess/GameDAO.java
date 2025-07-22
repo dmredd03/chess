@@ -1,13 +1,14 @@
 package dataaccess;
 import model.Model;
+import service.AlreadyTaken;
 
 import java.util.ArrayList;
 
 public interface GameDAO {
     int createGame(String gameName) throws DataAccessException;
     Model.GameData getGame(int gameID);
-    ArrayList<Model.PrintGameData> listGame();
-    void updateGame(String playerColor, String username, int gameID);
+    ArrayList<Model.PrintGameData> listGame() throws DataAccessException;
+    void updateGame(String playerColor, String username, int gameID) throws AlreadyTaken;
     void clearGameDAO();
 }
 
