@@ -141,9 +141,8 @@ public class DataAccessTests {
 
     @Test
     public void createAuthNegative() throws Exception {
-        authSQL.createAuth("user");
         assertThrows(DataAccessException.class, () -> {
-           authSQL.createAuth("user"); // line already exists
+           authSQL.createAuth(null);
         });
     }
 

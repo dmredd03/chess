@@ -9,7 +9,7 @@ import java.util.UUID;
 public class AuthSQLDAO implements AuthDAO {
 
     public String createAuth(String username) throws DataAccessException {
-        if (authExists(username)) { throw new DataAccessException("authToken already exists"); }
+        // if (authExists(username)) { throw new DataAccessException("authToken already exists"); }
         String newToken = UUID.randomUUID().toString();
 
         try (var conn = DatabaseManager.getConnection())  {
