@@ -142,14 +142,12 @@ public class GameSQLDAO implements GameDAO {
             )
             """;
 
-    public void clearGameDAO() {
+    public void clearGameDAO() throws DataAccessException, SQLException {
         try (var conn = DatabaseManager.getConnection()) {
             String drop = "TRUNCATE TABLE gameData";
             try (var dropStatement = conn.prepareStatement(drop)) {
                 dropStatement.executeUpdate();
             }
-        } catch (DataAccessException | SQLException e) {
-            return ;
         }
     }
 

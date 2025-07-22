@@ -8,6 +8,7 @@ import spark.Request;
 import spark.Response;
 import com.google.gson.Gson;
 
+import java.sql.SQLException;
 import java.util.Map;
 
 public class HandlerLogic implements Route {
@@ -176,7 +177,7 @@ public class HandlerLogic implements Route {
             ClearService service = new ClearService(userDAO, authDAO, gameDAO);
             Model.ClearResult clearResult = service.clear();
             return serializer.toJson(clearResult);
-        } catch (Exception e) {
+        } catch (SQLException | DataAccessException e) {
             res.status(500);
             return serializer.toJson(Map.of("message", "Error: (" + e.getMessage() + ")"));
         }

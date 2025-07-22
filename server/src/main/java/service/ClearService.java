@@ -3,6 +3,8 @@ package service;
 import dataaccess.*;
 import model.Model;
 
+import java.sql.SQLException;
+
 public class ClearService {
     private UserSQLDAO userDAO;
     private AuthSQLDAO authDAO;
@@ -14,7 +16,7 @@ public class ClearService {
         this.gameDAO = gameDAO;
     }
 
-    public Model.ClearResult clear() {
+    public Model.ClearResult clear() throws DataAccessException, SQLException {
         userDAO.clearUserDAO();
         gameDAO.clearGameDAO();
         authDAO.clearAuthDAO();

@@ -2,6 +2,7 @@ package dataaccess;
 import model.Model;
 import service.AlreadyTaken;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public interface GameDAO {
@@ -9,7 +10,7 @@ public interface GameDAO {
     Model.GameData getGame(int gameID);
     ArrayList<Model.PrintGameData> listGame() throws DataAccessException;
     void updateGame(String playerColor, String username, int gameID) throws AlreadyTaken;
-    void clearGameDAO();
+    void clearGameDAO() throws DataAccessException, SQLException;
 }
 
 // Table:

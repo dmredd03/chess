@@ -84,18 +84,17 @@ public class UserSQLDAO implements UserDAO {
                         email varchar(256) NOT NULL
                         )
                         """;
-    public void clearUserDAO() {
+    public void clearUserDAO() throws DataAccessException, SQLException {
         try (var conn = DatabaseManager.getConnection()) {
             String drop = "TRUNCATE TABLE userData";
             try (var dropStatement = conn.prepareStatement(drop)) {
                 dropStatement.executeUpdate();
             }
-        } catch (DataAccessException | SQLException e) {
-            return ;
         }
     }
 
-    private String hashPassword(String clearTextPassword) {
+    private String hashPassword(String clearTextPassword) throws DataAccessException {
+        if (clearTextPassword == null ) { throw new DataAccessException("Password can't be null"); }
         return BCrypt.hashpw(clearTextPassword, BCrypt.gensalt());
     }
 

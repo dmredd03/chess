@@ -83,14 +83,12 @@ public class AuthSQLDAO implements AuthDAO {
             )
             """;
 
-    public void clearAuthDAO() {
+    public void clearAuthDAO() throws DataAccessException, SQLException {
         try (var conn = DatabaseManager.getConnection()) {
             String drop = "TRUNCATE TABLE authData";
             try (var dropStatement = conn.prepareStatement(drop)) {
                 dropStatement.executeUpdate();
             }
-        } catch (DataAccessException | SQLException e) {
-            return ;
         }
     }
 
