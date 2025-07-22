@@ -22,8 +22,8 @@ public class GameSQLDAO implements GameDAO {
             ps.setInt(1, newGameID);
             ps.setString(2, gameName);
             ChessGame defaultGame = new ChessGame();
-            String GsonGame = new Gson().toJson(defaultGame);
-            ps.setString(3, GsonGame);
+            String gsonGame = new Gson().toJson(defaultGame);
+            ps.setString(3, gsonGame);
 
             ps.executeUpdate();
             return newGameID;
@@ -94,16 +94,20 @@ public class GameSQLDAO implements GameDAO {
             var ps = conn.prepareStatement(statement);
             ps.setInt(1, gameID);
             try ( var rs = ps.executeQuery() ) {
-                if (rs.next()) {
-                    String whiteUsername = rs.getString("whiteUsername");
-                    String blackUsername = rs.getString("blackUsername");
-                    var newStatement = "UPDATE gameData"; // placeholder
-                    switch (playerColor) {
-                        case "WHITE":
-                            if (whiteUsername != null) { throw new AlreadyTaken("White player already taken"); }
-                            newStatement = "UPDATE gameData SET whiteUsername = ? WHERE gameID = ?";
+                if (!rs.next()) {
+                    throw new DataAccessException("Game not found");
+                }
 
-                            break;
+
+                String whiteUsername = rs.getString("whiteUsername");
+                String blackUsername = rs.getString("blackUsername");
+                var newStatement = "UPDATE gameData"; // placeholder
+                switch (playerColor) {
+                    case "WHITE":
+                        if (whiteUsername != null) { throw new AlreadyTaken("White player already taken"); }
+                        newStatement = "UPDATE gameData SET whiteUsername = ? WHERE gameID = ?";
+
+                        break;
                         case "BLACK":
                             if (blackUsername != null) { throw new AlreadyTaken("Black player already taken"); }
                             newStatement = "UPDATE gameData SET blackUsername = ? WHERE gameID = ?";
@@ -118,9 +122,7 @@ public class GameSQLDAO implements GameDAO {
                         newPs.setInt(2, gameID);
                         newPs.executeUpdate();
                     }
-                } else {
-                    throw new DataAccessException("Game not found");
-                }
+
             }
 
         }

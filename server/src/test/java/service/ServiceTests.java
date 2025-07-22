@@ -168,16 +168,16 @@ public class ServiceTests {
         ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
         clearService.clear();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
-        Model.RegisterRequest regReq = new Model.RegisterRequest("david", "12345", "david@email.com");
+        Model.RegisterRequest regReq = new Model.RegisterRequest("sam", "6789", "sam@email.com");
         userService.register(regReq);
-        Model.LoginRequest loginReq = new Model.LoginRequest("david", "12345");
-        Model.LoginResult loginResult = userService.login(loginReq);
+        Model.LoginRequest loginReq = new Model.LoginRequest("sam", "6789");
+        Model.LoginResult login = userService.login(loginReq);
 
-        Model.CreateGameRequest gameReq = new Model.CreateGameRequest("myFirstGame");
-        Model.CreateGameRequest gameReq2 = new Model.CreateGameRequest("mySecondGame");
+        Model.CreateGameRequest gameReq = new Model.CreateGameRequest("gameOne");
+        Model.CreateGameRequest gameReq2 = new Model.CreateGameRequest("gameTwo");
         GameService gameService = new GameService(userDAO, authDAO, gameDAO);
-        gameService.createGame(gameReq, authDAO.getAuth(loginResult.authToken()).authToken());
-        gameService.createGame(gameReq2, authDAO.getAuth(loginResult.authToken()).authToken());
+        gameService.createGame(gameReq, authDAO.getAuth(login.authToken()).authToken());
+        gameService.createGame(gameReq2, authDAO.getAuth(login.authToken()).authToken());
 
         assertThrows(Exception.class, () -> {
             gameService.listGames(new Model.ListGameRequest("Bad authorization"));

@@ -29,7 +29,8 @@ public class GameService {
         return new Model.CreateGameResult(newGameID);
     }
 
-    public Model.JoinGameResult joinGame(Model.JoinGameRequest joinRequest, String authorization) throws DataAccessException, AlreadyTaken, SQLException {
+    public Model.JoinGameResult joinGame(Model.JoinGameRequest joinRequest, String authorization)
+            throws DataAccessException, AlreadyTaken, SQLException {
         Model.AuthData myAuthData = authDAO.getAuth(authorization);
         Model.GameData myGame = gameDAO.getGame(joinRequest.gameID());
         String myUsername = authDAO.getUserByAuth(authorization);

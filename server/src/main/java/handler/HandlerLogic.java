@@ -88,11 +88,7 @@ public class HandlerLogic implements Route {
             res.status(400);
             return serializer.toJson(Map.of("message", "Error: bad request"));
         } catch (DataAccessException e) {
-            if (e.getMessage().equals("failed to get connection")) {
-                res.status(500);
-            } else {
-                res.status(401);
-            }
+            getResStatus(res, e);
             return serializer.toJson(Map.of("message", "Error: unauthorized"));
         } catch (Exception e) {
             res.status(500);
@@ -108,11 +104,7 @@ public class HandlerLogic implements Route {
             Model.LogoutResult myLogoutResult = service.logout(myLogoutRequest);
             return serializer.toJson(myLogoutResult);
         } catch (DataAccessException e) {
-            if (e.getMessage().equals("failed to get connection")) {
-                res.status(500);
-            } else {
-                res.status(401);
-            }
+            getResStatus(res, e);
             return serializer.toJson(Map.of("message", "Error: unauthorized"));
         } catch (Exception e) {
             res.status(500);
@@ -128,11 +120,7 @@ public class HandlerLogic implements Route {
             Model.ListGameResult listGameResult = service.listGames(myListGameRequest);
             return serializer.toJson(listGameResult);
         } catch (DataAccessException e) {
-            if (e.getMessage().equals("failed to get connection")) {
-                res.status(500);
-            } else {
-                res.status(401);
-            }
+            getResStatus(res, e);
             return serializer.toJson(Map.of("message", "Error: unauthorized"));
         } catch (Exception e) {
             res.status(500);
@@ -153,11 +141,7 @@ public class HandlerLogic implements Route {
             res.status(400);
             return serializer.toJson(Map.of("message", "Error: bad request"));
         } catch (DataAccessException e) {
-            if (e.getMessage().equals("failed to get connection")) {
-                res.status(500);
-            } else {
-                res.status(401);
-            }
+            getResStatus(res, e);
             return serializer.toJson(Map.of("message", "Error: unauthorized"));
         } catch (Exception e) {
             res.status(500);
@@ -179,11 +163,7 @@ public class HandlerLogic implements Route {
             res.status(400);
             return serializer.toJson(Map.of("message", "Error: bad request"));
         } catch (DataAccessException e) {
-            if (e.getMessage().equals("failed to get connection")) {
-                res.status(500);
-            } else {
-                res.status(401);
-            }
+            getResStatus(res, e);
             return serializer.toJson(Map.of("message", "Error: unauthorized"));
         } catch (AlreadyTaken e) {
             res.status(403);
@@ -206,7 +186,15 @@ public class HandlerLogic implements Route {
             return serializer.toJson(Map.of("message", "Error: (" + e.getMessage() + ")"));
         }
     }
-// consider moving badrequest checks somewhere else?
+
+    private void getResStatus(Response res, Exception e) {
+        if (e.getMessage().equals("failed to get connection")) {
+            res.status(500);
+        } else {
+            res.status(401);
+        }
+    }
+
     private void badRequestRegister(Model.RegisterRequest registerRequest) throws BadRequest {
         if (registerRequest == null ||
         registerRequest.username() == null || registerRequest.username().isBlank() ||
