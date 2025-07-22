@@ -3,6 +3,8 @@ import dataaccess.*;
 
 import model.Model;
 
+import java.sql.SQLException;
+
 
 public class UserService {
     private UserSQLDAO userDAO;
@@ -15,7 +17,7 @@ public class UserService {
         this.gameDAO = gameDAO;
     }
 
-    public Model.RegisterResult register(Model.RegisterRequest registerRequest) throws DataAccessException {
+    public Model.RegisterResult register(Model.RegisterRequest registerRequest) throws DataAccessException, SQLException {
 
         Model.UserData newUser = userDAO.getUser(registerRequest.username());
         if (newUser == null) {
@@ -30,7 +32,7 @@ public class UserService {
         return new Model.RegisterResult(registerRequest.username(), authKey);
     }
 
-    public Model.LoginResult login(Model.LoginRequest loginRequest) throws DataAccessException {
+    public Model.LoginResult login(Model.LoginRequest loginRequest) throws DataAccessException, SQLException {
         Model.UserData inputtedData = new Model.UserData(loginRequest.username(), loginRequest.password(), null);
         Model.UserData loginUser = userDAO.getUser(loginRequest.username());
         if (loginUser == null) {
@@ -44,7 +46,7 @@ public class UserService {
         return new Model.LoginResult(loginUser.username(), myAuthToken);
     }
 
-    public Model.LogoutResult logout(Model.LogoutRequest logoutRequest) throws DataAccessException {
+    public Model.LogoutResult logout(Model.LogoutRequest logoutRequest) throws DataAccessException, SQLException {
         Model.AuthData myAuthToken = authDAO.getAuth(logoutRequest.authorization()); // throws unauthorized exception if not found
         authDAO.deleteAuth(myAuthToken.authToken());
         return new Model.LogoutResult();

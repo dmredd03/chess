@@ -14,7 +14,7 @@ import java.util.Random;
 
 public class GameSQLDAO implements GameDAO {
 
-    public int createGame(String gameName) throws DataAccessException {
+    public int createGame(String gameName) throws DataAccessException, SQLException {
         try (var conn = DatabaseManager.getConnection()) {
             var statement = "INSERT INTO gameData (gameID, gameName, game) VALUES (?, ?, ?)";
             var ps = conn.prepareStatement(statement);
@@ -27,8 +27,6 @@ public class GameSQLDAO implements GameDAO {
 
             ps.executeUpdate();
             return newGameID;
-        } catch (SQLException | DataAccessException e) {
-            throw new DataAccessException("Game already exists");
         }
     }
 
@@ -44,7 +42,7 @@ public class GameSQLDAO implements GameDAO {
         return gameID;
     }
 
-    public Model.GameData getGame(int gameID) {
+    public Model.GameData getGame(int gameID) throws SQLException {
         try (var conn = DatabaseManager.getConnection()) {
             var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM gameData WHERE gameID = ?";
             var ps = conn.prepareStatement(statement);
@@ -56,7 +54,7 @@ public class GameSQLDAO implements GameDAO {
                     return null; // not found
                 }
             }
-        } catch (SQLException | DataAccessException e) {
+        } catch (DataAccessException e) {
             return null;
         }
     }
@@ -70,7 +68,7 @@ public class GameSQLDAO implements GameDAO {
         return new Model.GameData(gameID, whiteUsername, blackUsername, gameName, chessGame);
     }
 
-    public ArrayList<Model.PrintGameData> listGame() throws DataAccessException {
+    public ArrayList<Model.PrintGameData> listGame() throws DataAccessException, SQLException {
         ArrayList<Model.PrintGameData> formattedGameList = new ArrayList<>();
         try (var conn = DatabaseManager.getConnection()) {
             var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM gameData";
@@ -87,12 +85,10 @@ public class GameSQLDAO implements GameDAO {
             }
 
             return formattedGameList;
-        } catch (SQLException | DataAccessException e) {
-            throw new DataAccessException("SQL bad");
         }
     }
 
-    public void updateGame(String playerColor, String username, int gameID) throws AlreadyTaken {
+    public void updateGame(String playerColor, String username, int gameID) throws DataAccessException, AlreadyTaken, SQLException {
         try (var conn = DatabaseManager.getConnection()) {
             var statement = "SELECT whiteUsername, blackUsername FROM gameData WHERE gameID = ?";
             var ps = conn.prepareStatement(statement);
@@ -127,8 +123,6 @@ public class GameSQLDAO implements GameDAO {
                 }
             }
 
-        } catch (SQLException | DataAccessException e) {
-            throw new AlreadyTaken("update failed");
         }
     }
 

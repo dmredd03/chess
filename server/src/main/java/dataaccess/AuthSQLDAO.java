@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public class AuthSQLDAO implements AuthDAO {
 
-    public String createAuth(String username) throws DataAccessException {
+    public String createAuth(String username) throws DataAccessException, SQLException {
         // if (authExists(username)) { throw new DataAccessException("authToken already exists"); }
         String newToken = UUID.randomUUID().toString();
 
@@ -19,13 +19,11 @@ public class AuthSQLDAO implements AuthDAO {
             ps.setString(2, username);
 
             ps.executeUpdate();
-        } catch (SQLException | DataAccessException e) {
-            throw new DataAccessException("Already has authToken");
         }
         return newToken;
     }
 
-    public Model.AuthData getAuth(String authToken) throws DataAccessException {
+    public Model.AuthData getAuth(String authToken) throws DataAccessException, SQLException {
         try (var conn = DatabaseManager.getConnection()) {
             var statement = "SELECT authToken, username FROM authData WHERE authToken = ?";
             var ps = conn.prepareStatement(statement);
@@ -39,12 +37,10 @@ public class AuthSQLDAO implements AuthDAO {
                     throw new DataAccessException("authorization not found");
                 }
             }
-        } catch (SQLException | DataAccessException e) {
-            throw new DataAccessException("authorization not found");
         }
     }
 
-    public void deleteAuth(String authToken) throws DataAccessException {
+    public void deleteAuth(String authToken) throws DataAccessException, SQLException {
         try (var conn = DatabaseManager.getConnection()) {
             var statement = "DELETE FROM authData WHERE authToken = ?";
             var ps = conn.prepareStatement(statement);
@@ -53,12 +49,10 @@ public class AuthSQLDAO implements AuthDAO {
             if (deleted == 0) {
                 throw new DataAccessException("Auth not found");
             }
-        } catch (SQLException | DataAccessException e) {
-            throw new DataAccessException("Auth not found");
         }
     }
 
-    public String getUserByAuth(String authToken) throws DataAccessException {
+    public String getUserByAuth(String authToken) throws DataAccessException, SQLException {
         try (var conn = DatabaseManager.getConnection()) {
             var statement = "SELECT authToken, username FROM authData WHERE authToken = ?";
             var ps = conn.prepareStatement(statement);
@@ -71,8 +65,6 @@ public class AuthSQLDAO implements AuthDAO {
                     throw new DataAccessException("authorization not found");
                 }
             }
-        } catch (SQLException | DataAccessException e) {
-            throw new DataAccessException("authorization not found");
         }
     }
 

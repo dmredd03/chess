@@ -91,7 +91,7 @@ public class DataAccessTests {
             assertTrue(() -> {
                 try {
                     return userSQL.matchingPassword(testUser);
-                } catch (DataAccessException e) {
+                } catch (DataAccessException | SQLException e) {
                     throw new RuntimeException(e);
                 }
             });
@@ -107,7 +107,7 @@ public class DataAccessTests {
         assertFalse(() -> {
             try {
                 return userSQL.matchingPassword(sameUserDiffPassword);
-            } catch (DataAccessException e) {
+            } catch (DataAccessException | SQLException e) {
                 throw new RuntimeException(e);
             }
         });

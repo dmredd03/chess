@@ -4,9 +4,9 @@ import model.Model;
 import java.sql.SQLException;
 
 interface UserDAO {
-    Model.UserData getUser(String username) throws DataAccessException;
-    void createUser(Model.UserData newUsername) throws DataAccessException;
-    Boolean matchingPassword(Model.UserData user) throws DataAccessException;
+    Model.UserData getUser(String username) throws DataAccessException, SQLException;
+    void createUser(Model.UserData newUsername) throws DataAccessException, SQLException;
+    Boolean matchingPassword(Model.UserData user) throws DataAccessException, SQLException;
     void clearUserDAO() throws DataAccessException, SQLException;
 }
 

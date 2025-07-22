@@ -6,10 +6,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public interface GameDAO {
-    int createGame(String gameName) throws DataAccessException;
-    Model.GameData getGame(int gameID);
-    ArrayList<Model.PrintGameData> listGame() throws DataAccessException;
-    void updateGame(String playerColor, String username, int gameID) throws AlreadyTaken;
+    int createGame(String gameName) throws DataAccessException, SQLException;
+    Model.GameData getGame(int gameID) throws SQLException;
+    ArrayList<Model.PrintGameData> listGame() throws DataAccessException, SQLException;
+    void updateGame(String playerColor, String username, int gameID) throws DataAccessException, AlreadyTaken, SQLException;
     void clearGameDAO() throws DataAccessException, SQLException;
 }
 

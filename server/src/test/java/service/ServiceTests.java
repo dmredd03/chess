@@ -1,11 +1,17 @@
 package service;// THIS IS FOR TEST
 import dataaccess.*;
 import model.Model;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.sql.SQLException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 
 public class ServiceTests {
+
     @Test
     public void testRegisterPositive() throws Exception {
         UserSQLDAO userDAO = new UserSQLDAO();
