@@ -84,18 +84,4 @@ public class AuthSQLDAO implements AuthDAO {
         }
     }
 
-//    private boolean authExists(String username) throws DataAccessException {
-//        try (var conn = DatabaseManager.getConnection()) {
-//            var statement = "SELECT authToken FROM authData WHERE username = ?";
-//            try (var ps = conn.prepareStatement(statement)) {
-//                ps.setString(1, username);
-//
-//                try (var rs = ps.executeQuery()) {
-//                    return rs.next();
-//                }
-//            }
-//        } catch (SQLException | DataAccessException e) {
-//            throw new DataAccessException("Connection error");
-//        }
-//    }
 }
