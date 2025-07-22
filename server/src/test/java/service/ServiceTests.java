@@ -12,11 +12,28 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ServiceTests {
 
+
+
+    @BeforeAll
+    public static void createDatabase() throws DataAccessException {
+        DatabaseManager.createDatabase();
+    }
+
+
+
+    @BeforeEach
+    public void populateData() throws DataAccessException {
+        DatabaseManager.configTables();
+    }
+
+
     @Test
     public void testRegisterPositive() throws Exception {
         UserSQLDAO userDAO = new UserSQLDAO();
         AuthSQLDAO authDAO = new AuthSQLDAO();
         GameSQLDAO gameDAO = new GameSQLDAO();
+        ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
+        clearService.clear();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
 
         Model.RegisterRequest req = new Model.RegisterRequest("david", "12345", "david@email.com");
@@ -35,6 +52,8 @@ public class ServiceTests {
         UserSQLDAO userDAO = new UserSQLDAO();
         AuthSQLDAO authDAO = new AuthSQLDAO();
         GameSQLDAO gameDAO = new GameSQLDAO();
+        ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
+        clearService.clear();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
 
         Model.RegisterRequest req = new Model.RegisterRequest("david", "12345", "david@email.com");
@@ -51,6 +70,8 @@ public class ServiceTests {
         UserSQLDAO userDAO = new UserSQLDAO();
         AuthSQLDAO authDAO = new AuthSQLDAO();
         GameSQLDAO gameDAO = new GameSQLDAO();
+        ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
+        clearService.clear();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
 
         Model.RegisterRequest regReq = new Model.RegisterRequest("david", "12345", "david@email.com");
@@ -67,6 +88,8 @@ public class ServiceTests {
         UserSQLDAO userDAO = new UserSQLDAO();
         AuthSQLDAO authDAO = new AuthSQLDAO();
         GameSQLDAO gameDAO = new GameSQLDAO();
+        ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
+        clearService.clear();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
 
         Model.RegisterRequest regReq = new Model.RegisterRequest("david", "12345", "david@email.com");
@@ -83,6 +106,8 @@ public class ServiceTests {
         UserSQLDAO userDAO = new UserSQLDAO();
         AuthSQLDAO authDAO = new AuthSQLDAO();
         GameSQLDAO gameDAO = new GameSQLDAO();
+        ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
+        clearService.clear();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
         Model.RegisterRequest regReq = new Model.RegisterRequest("david", "12345", "david@email.com");
         Model.RegisterResult regResult = userService.register(regReq);
@@ -96,6 +121,8 @@ public class ServiceTests {
         UserSQLDAO userDAO = new UserSQLDAO();
         AuthSQLDAO authDAO = new AuthSQLDAO();
         GameSQLDAO gameDAO = new GameSQLDAO();
+        ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
+        clearService.clear();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
         Model.RegisterRequest regReq = new Model.RegisterRequest("david", "12345", "david@email.com");
         userService.register(regReq);
@@ -114,6 +141,8 @@ public class ServiceTests {
         UserSQLDAO userDAO = new UserSQLDAO();
         AuthSQLDAO authDAO = new AuthSQLDAO();
         GameSQLDAO gameDAO = new GameSQLDAO();
+        ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
+        clearService.clear();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
         Model.RegisterRequest regReq = new Model.RegisterRequest("david", "12345", "david@email.com");
         userService.register(regReq);
@@ -136,6 +165,8 @@ public class ServiceTests {
         UserSQLDAO userDAO = new UserSQLDAO();
         AuthSQLDAO authDAO = new AuthSQLDAO();
         GameSQLDAO gameDAO = new GameSQLDAO();
+        ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
+        clearService.clear();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
         Model.RegisterRequest regReq = new Model.RegisterRequest("david", "12345", "david@email.com");
         userService.register(regReq);
@@ -160,6 +191,8 @@ public class ServiceTests {
         UserSQLDAO userDAO = new UserSQLDAO();
         AuthSQLDAO authDAO = new AuthSQLDAO();
         GameSQLDAO gameDAO = new GameSQLDAO();
+        ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
+        clearService.clear();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
         Model.RegisterRequest regReq = new Model.RegisterRequest("david", "12345", "david@email.com");
         userService.register(regReq);
@@ -180,6 +213,8 @@ public class ServiceTests {
         UserSQLDAO userDAO = new UserSQLDAO();
         AuthSQLDAO authDAO = new AuthSQLDAO();
         GameSQLDAO gameDAO = new GameSQLDAO();
+        ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
+        clearService.clear();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
         Model.RegisterRequest regReq = new Model.RegisterRequest("david", "12345", "david@email.com");
         userService.register(regReq);
@@ -201,6 +236,8 @@ public class ServiceTests {
         UserSQLDAO userDAO = new UserSQLDAO();
         AuthSQLDAO authDAO = new AuthSQLDAO();
         GameSQLDAO gameDAO = new GameSQLDAO();
+        ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
+        clearService.clear();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
         Model.RegisterRequest regReq = new Model.RegisterRequest("david", "12345", "david@email.com");
         userService.register(regReq);
@@ -236,6 +273,8 @@ public class ServiceTests {
         UserSQLDAO userDAO = new UserSQLDAO();
         AuthSQLDAO authDAO = new AuthSQLDAO();
         GameSQLDAO gameDAO = new GameSQLDAO();
+        ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
+        clearService.clear();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
         Model.RegisterRequest regReq = new Model.RegisterRequest("david", "12345", "david@email.com");
         userService.register(regReq);
@@ -272,6 +311,8 @@ public class ServiceTests {
         UserSQLDAO userDAO = new UserSQLDAO();
         AuthSQLDAO authDAO = new AuthSQLDAO();
         GameSQLDAO gameDAO = new GameSQLDAO();
+        ClearService clearServiceBase = new ClearService(userDAO, authDAO, gameDAO);
+        clearServiceBase.clear();
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
         ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
         Model.RegisterRequest req = new Model.RegisterRequest("david", "12345", "david@email.com");

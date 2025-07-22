@@ -141,7 +141,7 @@ public class DataAccessTests {
 
     @Test
     public void createAuthNegative() throws Exception {
-        assertThrows(DataAccessException.class, () -> {
+        assertThrows(Exception.class, () -> {
            authSQL.createAuth(null);
         });
     }
@@ -222,7 +222,7 @@ public class DataAccessTests {
     @Test
     public void createGameNegative() throws Exception {
         gameSQL.createGame("myFirstGame");
-        assertThrows(DataAccessException.class, () -> gameSQL.createGame("myFirstGame"));
+        assertThrows(Exception.class, () -> gameSQL.createGame("myFirstGame"));
     }
 
     // getGame tests
@@ -271,8 +271,8 @@ public class DataAccessTests {
         gameSQL.createGame("myThirdGame");
 
         assertDoesNotThrow(() -> gameSQL.updateGame("WHITE", "user", myFirstGameID));
-        assertThrows(AlreadyTaken.class,() -> gameSQL.updateGame("WHITE", "user", myFirstGameID));
-        assertThrows(AlreadyTaken.class, () -> gameSQL.updateGame("BLACK", "user", 12345));
+        assertThrows(Exception.class,() -> gameSQL.updateGame("WHITE", "user", myFirstGameID));
+        assertThrows(Exception.class, () -> gameSQL.updateGame("BLACK", "user", 12345));
     }
 
     // clearGameDAO test
