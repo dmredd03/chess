@@ -5,6 +5,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import service.AlreadyTaken;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -202,6 +203,90 @@ public class DataAccessTests {
         authSQL.clearAuthDAO();
         try (var conn = DatabaseManager.getConnection()) {
             var ps = conn.prepareStatement("SELECT COUNT(*) FROM authData");
+            var rs = ps.executeQuery();
+            if (rs.next()) {
+                int count = rs.getInt(1);
+                assertEquals(0, count, "Table should be empty");
+            } else {
+                fail("not empty");
+            }
+        }
+    }
+
+    // GameSQLDAO tests
+    // createGame tests
+    @Test
+    public void createGamePositive() throws Exception {
+        assertDoesNotThrow(() -> gameSQL.createGame("myFirstGame"));
+    }
+
+    @Test
+    public void createGameNegative() throws Exception {
+        gameSQL.createGame("myFirstGame");
+        assertThrows(DataAccessException.class, () -> gameSQL.createGame("myFirstGame"));
+    }
+
+    // getGame tests
+    @Test
+    public void getGamePositive() throws Exception {
+        int myFirstGameID = gameSQL.createGame("myFirstGame");
+        assertNotNull(gameSQL.getGame(myFirstGameID));
+    }
+
+    @Test
+    public void getGameNegative() throws Exception {
+        int myFirstGameID = gameSQL.createGame("myFirstGame");
+        assertNull(gameSQL.getGame(43110));
+    }
+
+    // listGameTests
+    @Test
+    public void listGamePositive() throws Exception {
+        gameSQL.createGame("myFirstGame");
+        gameSQL.createGame("mySecondGame");
+        gameSQL.createGame("myThirdGame");
+
+        assertDoesNotThrow(() -> gameSQL.listGame());
+    }
+
+    @Test
+    public void listGameNegative() throws Exception {
+        assertEquals(0, gameSQL.listGame().size());
+    }
+
+    // updateGame tests
+    @Test
+    public void updateGamePositive() throws Exception {
+        int myFirstGameID = gameSQL.createGame("myFirstGame");
+        gameSQL.createGame("mySecondGame");
+        gameSQL.createGame("myThirdGame");
+
+        assertDoesNotThrow(() -> gameSQL.updateGame("WHITE", "user", myFirstGameID));
+        assertDoesNotThrow(() -> gameSQL.updateGame("BLACK", "user", myFirstGameID));
+    }
+
+    @Test
+    public void updateGameNegative() throws Exception {
+        int myFirstGameID = gameSQL.createGame("myFirstGame");
+        gameSQL.createGame("mySecondGame");
+        gameSQL.createGame("myThirdGame");
+
+        assertDoesNotThrow(() -> gameSQL.updateGame("WHITE", "user", myFirstGameID));
+        assertThrows(AlreadyTaken.class,() -> gameSQL.updateGame("WHITE", "user", myFirstGameID));
+        assertThrows(AlreadyTaken.class, () -> gameSQL.updateGame("BLACK", "user", 12345));
+    }
+
+    // clearGameDAO test
+    @Test
+    public void clearGameDAOPositive() throws Exception {
+        gameSQL.createGame("myFirstGame");
+        gameSQL.createGame("mySecondGame");
+        gameSQL.createGame("myThirdGame");
+
+        gameSQL.clearGameDAO();
+
+        try (var conn = DatabaseManager.getConnection()) {
+            var ps = conn.prepareStatement("SELECT COUNT(*) FROM gameData");
             var rs = ps.executeQuery();
             if (rs.next()) {
                 int count = rs.getInt(1);
