@@ -95,7 +95,8 @@ public class DatabaseManager {
             whiteUsername varchar(256) DEFAULT NULL,
             blackUsername varchar(256) DEFAULT NULL,
             gameName varchar(256) NOT NULL,
-            game TEXT NOT NULL
+            game TEXT NOT NULL,
+            gameID int NOT NULL
             )
             """
     };
