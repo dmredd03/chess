@@ -1,7 +1,5 @@
 package ui;
 
-import server.ServerFacade;
-
 import java.util.Scanner;
 
 public class PreloginUI {
@@ -17,13 +15,16 @@ public class PreloginUI {
 
         Scanner scanner = new Scanner(System.in);
         var result = "";
-        client.preloginEval("help");
+        System.out.print(client.preloginEval("help"));
         while (!result.equals("quit")) {
             printPrompt();
             String line = scanner.nextLine();
             try {
                 result = client.preloginEval(line);
                 System.out.print(result);
+                if (result.contains("Successfully logged in") | result.contains("Successfully registered")) {
+                    new PostloginUI(client).run();
+                }
             } catch (Exception e) {
                 var msg = e.toString();
                 System.out.print(msg);
@@ -32,6 +33,6 @@ public class PreloginUI {
     }
 
     private void printPrompt() {
-        System.out.print("Enter command:");
+        System.out.print("Logged OUT: ");
     }
 }
