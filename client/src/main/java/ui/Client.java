@@ -92,7 +92,7 @@ public class Client {
             "Logout of current user: logout\n" +
             "Create a new game: creategame <game name>\n" +
             "List activate games: listgame\n" +
-            "Play a game: playgame <game #>\n" +
+            "Play a game: playgame <game #> <Team Color (White or Black)>\n" +
             "Observe a current game: observegame <game #>\n" +
             "Quit Program: quit\n" +
             "Help for commands: help\n";;
@@ -121,7 +121,6 @@ public class Client {
     }
 
     public String listGame() throws ResponseException {
-        if (gameNumberTogameID.isEmpty()) { return "No active games\n"; }
 
         Model.ListGameRequest request = new Model.ListGameRequest(server.getAuthorization());
         Model.ListGameResult result = server.listGame(request);
@@ -136,7 +135,11 @@ public class Client {
             if (game.whiteUsername() != null) { list += "White: " + game.whiteUsername() + "\n"; }
             if (game.blackUsername() != null) { list += "Black: " + game.blackUsername() + "\n"; }
             list += "\n";
+            i++;
         }
+
+        if (gameNumberTogameID.isEmpty()) { return "No active games\n"; }
+
         return list;
     }
 
@@ -145,7 +148,11 @@ public class Client {
         if (params.length >= 2) {
             int gameNumber = Integer.parseInt(params[0]);
             int gameID = gameNumberTogameID.get(gameNumber);
-            Model.JoinGameRequest request = new Model.JoinGameRequest(params[1], gameID);
+            String teamColor = params[1].trim().toUpperCase();
+            if (!teamColor.equals("WHITE") && !teamColor.equals("BLACK")) {
+                throw new ResponseException(400, "Team color must be WHITE or BLACK\n");
+            }
+            Model.JoinGameRequest request = new Model.JoinGameRequest(teamColor, gameID);
             server.joinGame(request);
 
             return "Joined game " + gameNumber + " as " + params[1] + "\n";

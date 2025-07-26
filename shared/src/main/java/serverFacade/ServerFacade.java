@@ -35,7 +35,7 @@ public class ServerFacade {
 
     public Model.ListGameResult listGame(Model.ListGameRequest request) throws ResponseException {
         var path = "/game";
-        return this.makeRequest("GET", path, request, Model.ListGameResult.class);
+        return this.makeRequest("GET", path, null, Model.ListGameResult.class);
     }
 
     public Model.CreateGameResult createGame(Model.CreateGameRequest request) throws ResponseException {

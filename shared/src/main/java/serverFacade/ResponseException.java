@@ -21,8 +21,18 @@ public class ResponseException extends Exception {
 
     public static ResponseException fromJson(InputStream stream) {
         var map = new Gson().fromJson(new InputStreamReader(stream), HashMap.class);
-        var status = ((Double)map.get("status")).intValue();
-        String message = map.get("message").toString();
+        int status = 0;
+        Object statusObj = map.get("status");
+        if (statusObj instanceof Number) {
+            status = ((Number) statusObj).intValue();
+        } else if (statusObj != null) {
+            try {
+                status = Integer.parseInt(statusObj.toString());
+            } catch (NumberFormatException ignored) {
+                status = 0;
+            }
+        }
+        String message = map.getOrDefault("message", "Unknown error").toString();
         return new ResponseException(status, message);
     }
 
