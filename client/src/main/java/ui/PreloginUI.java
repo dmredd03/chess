@@ -22,8 +22,9 @@ public class PreloginUI {
             try {
                 result = client.preloginEval(line);
                 System.out.print(result);
-                if (result.contains("Successfully logged in") | result.contains("Successfully registered")) {
+                if (result.contains("Successfully logged in") || result.contains("Successfully registered")) {
                     new PostloginUI(client).run();
+                    System.out.print(client.preloginEval("help"));
                 }
             } catch (Exception e) {
                 var msg = e.toString();

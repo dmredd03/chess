@@ -12,6 +12,7 @@ import java.net.*;
 public class ServerFacade {
 
     private final String serverUrl;
+    private String authorization;
 
     public ServerFacade(String url) {
         serverUrl = url;
@@ -47,6 +48,18 @@ public class ServerFacade {
         return this.makeRequest("PUT", path, request, Model.JoinGameResult.class);
     }
 
+    public void setAuthorization(String token) {
+        this.authorization = token;
+    }
+
+    public String getAuthorization() {
+        return this.authorization;
+    }
+
+    public void clearAuthorization() {
+        this.authorization = null;
+    }
+
 
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass)
@@ -56,6 +69,9 @@ public class ServerFacade {
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
+            if (authorization != null && !authorization.isEmpty()) {
+                http.setRequestProperty("Authorization", authorization);
+            }
 
             writeBody(request, http);
             http.connect();

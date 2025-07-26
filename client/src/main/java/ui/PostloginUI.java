@@ -12,14 +12,17 @@ public class PostloginUI {
     public void run() {
         Scanner scanner = new Scanner(System.in);
         var result = "";
-        System.out.print(client.postloginEval("help"));
         System.out.println(client.postloginEval("listgame")); // sets numbers
-        while (!result.equals("quit")) {
-// print prompt here
+        while (true) {
+            System.out.print(client.postloginEval("help"));
+            printPrompt();
             String line = scanner.nextLine();
             try {
                 result = client.postloginEval(line);
                 System.out.print(result);
+                if (result.contains("Successfully logged out") || result.equals("quit")) {
+                    break;
+                }
             } catch (Exception e) {
                 var msg = e.toString();
                 System.out.print(msg);

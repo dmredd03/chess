@@ -14,7 +14,7 @@ public class Client {
 
     private final ServerFacade server;
     private String authorization;
-    private Map<Integer, Integer> gameNumberTogameID; // gameNumber, gameID
+    private Map<Integer, Integer> gameNumberTogameID = new HashMap<>(); // gameNumber, gameID
 
     public Client(String serverUrl) {
         gameNumberTogameID = new HashMap<>();
@@ -48,6 +48,7 @@ public class Client {
         if (params.length >= 2) {
             Model.LoginRequest request = new Model.LoginRequest(params[0], params[1]);
             Model.LoginResult result = server.login(request);
+            server.setAuthorization(result.authToken());
             authorization = result.authToken();
 
             return "Successfully logged in as " + params[0] + "\n";
@@ -60,6 +61,7 @@ public class Client {
         if (params.length >= 3) {
             Model.RegisterRequest request = new Model.RegisterRequest(params[0], params[1], params[2]);
             Model.RegisterResult result = server.register(request);
+            server.setAuthorization(result.authToken());
             authorization = result.authToken();
 
             return "Successfully registered as " + params[0] + "\n";
@@ -100,6 +102,8 @@ public class Client {
             Model.LogoutRequest request = new Model.LogoutRequest(authorization);
             server.logout(request);
             authorization = null;
+            server.clearAuthorization();
+            gameNumberTogameID.clear();
 
             return "Successfully logged out\n";
         }
@@ -119,7 +123,7 @@ public class Client {
     public String listGame() throws ResponseException {
         if (gameNumberTogameID.isEmpty()) { return "No active games\n"; }
 
-        Model.ListGameRequest request = new Model.ListGameRequest(authorization);
+        Model.ListGameRequest request = new Model.ListGameRequest(server.getAuthorization());
         Model.ListGameResult result = server.listGame(request);
 
         String list = "";
