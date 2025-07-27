@@ -22,6 +22,8 @@ public class PostloginUI {
                 System.out.print(result);
                 if (result.contains("Successfully logged out") || result.equals("quit")) {
                     break;
+                } else if (result.contains("Observing") || result.contains("Joined")) {
+                    gameplayUI(result);
                 }
             } catch (Exception e) {
                 var msg = e.toString();
@@ -32,5 +34,11 @@ public class PostloginUI {
 
     private void printPrompt() {
         System.out.print("Logged IN: ");
+    }
+
+    private void gameplayUI(String result) {
+        String color = result.contains("white") ? "WHITE" : "BLACK";
+        new GameplayUI(client).run(color, result);
+        System.out.print(client.postloginEval("help"));
     }
 }

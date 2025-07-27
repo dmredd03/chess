@@ -172,4 +172,19 @@ public class Client {
     }
 
 
+    public String gameplayEval(String input) {
+        // try { TODO: for future gameplayImplementation
+            var tokens = input.toLowerCase().split(" ");
+            var cmd = (tokens.length > 0) ? tokens[0] : "help";
+            var params = Arrays.copyOfRange(tokens, 1, tokens.length);
+            return switch (cmd) {
+                case "quit" -> "quit";
+                default -> "quit";
+            };
+        // } catch (ResponseException e) {
+            // return e.getMessage();
+        // }
+    }
+
+
 }

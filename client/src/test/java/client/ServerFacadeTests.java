@@ -2,13 +2,14 @@ package client;
 
 import org.junit.jupiter.api.*;
 import server.Server;
+import ui.*;
 
 
 public class ServerFacadeTests {
 
     private static Server server;
 
-    @BeforeAll
+/*    @BeforeAll
     public static void init() {
         server = new Server();
         var port = server.run(0);
@@ -24,6 +25,13 @@ public class ServerFacadeTests {
     @Test
     public void sampleTest() {
         Assertions.assertTrue(true);
+    }*/
+
+    @Test
+    public void printWhiteBoardTest() {
+        new printGameboard().printBoardWhite();
+        System.out.print("\n");
+        new printGameboard().printBoardBlack();
     }
 
 }
