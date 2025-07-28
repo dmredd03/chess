@@ -8,8 +8,7 @@ public class Main {
         if (args.length == 1) {
             serverUrl = args[0];
         }
-        var piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
-        System.out.println("♕ 240 Chess Client: " + piece);
+        System.out.println("♕ 240 Chess Client: ");
 
         new PreloginUI(serverUrl).run();
     }
