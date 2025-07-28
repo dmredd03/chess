@@ -33,7 +33,7 @@ public class Client {
                 default -> helpPrelogin;
             };
         } catch (ResponseException e) {
-            return e.getMessage();
+            return e.getMessage() + "\n";
         }
     }
 
@@ -45,7 +45,7 @@ public class Client {
 
     public String login(String... params) throws ResponseException {
         // implement login code here
-        if (params.length >= 2) {
+        if (params.length == 2) {
             Model.LoginRequest request = new Model.LoginRequest(params[0], params[1]);
             Model.LoginResult result = server.login(request);
             server.setAuthorization(result.authToken());
@@ -58,7 +58,7 @@ public class Client {
 
     public String register(String... params) throws ResponseException {
         // register code
-        if (params.length >= 3) {
+        if (params.length == 3) {
             Model.RegisterRequest request = new Model.RegisterRequest(params[0], params[1], params[2]);
             Model.RegisterResult result = server.register(request);
             server.setAuthorization(result.authToken());
@@ -77,7 +77,7 @@ public class Client {
             return switch (cmd) {
                 case "logout" -> logout(params);
                 case "creategame" -> createGame(params);
-                case "listgame" -> listGame();
+                case "listgame" -> listGame(params);
                 case "playgame" -> playGame(params);
                 case "observegame" -> observeGame(params);
                 case "quit" -> "quit";
@@ -112,15 +112,18 @@ public class Client {
 
     public String createGame(String... params) throws ResponseException {
         if (params.length >= 1) {
-            Model.CreateGameRequest request = new Model.CreateGameRequest(params[0]);
+            String gameNameInput = String.join(" ", params);
+
+            Model.CreateGameRequest request = new Model.CreateGameRequest(gameNameInput);
             Model.CreateGameResult result = server.createGame(request);
 
-            return "Created game " + params[0] + "\n";
+            return "Created game " + gameNameInput + "\n";
         }
         throw new ResponseException(400, "Usage: creategame <game name>\n");
     }
 
-    public String listGame() throws ResponseException {
+    public String listGame(String... params) throws ResponseException {
+        if (params.length >= 1) { throw new ResponseException(400, "Usage: listgame\n"); }
 
         Model.ListGameRequest request = new Model.ListGameRequest(server.getAuthorization());
         Model.ListGameResult result = server.listGame(request);
@@ -145,9 +148,19 @@ public class Client {
 
     public String playGame(String... params) throws ResponseException {
         // params = gameNumber, team
-        if (params.length >= 2) {
-            int gameNumber = Integer.parseInt(params[0]);
-            int gameID = gameNumberTogameID.get(gameNumber);
+        if (params.length == 2) {
+            int gameNumber;
+            try {
+                gameNumber = Integer.parseInt(params[0]);
+            } catch (NumberFormatException e) {
+                throw new ResponseException(400, "Usage: playgame <game#> <Color: (White or Black)>\n");
+            }
+            int gameID;
+            try {
+                gameID = gameNumberTogameID.get(gameNumber);
+            } catch (NullPointerException e) {
+                throw new ResponseException(400, "Game does not exist\nUsage: playgame <game#> <Color: (White or Black)>\n");
+            }
             String teamColor = params[1].trim().toUpperCase();
             if (!teamColor.equals("WHITE") && !teamColor.equals("BLACK")) {
                 throw new ResponseException(400, "Team color must be WHITE or BLACK\n");
@@ -162,9 +175,19 @@ public class Client {
 
     public String observeGame(String... params) throws ResponseException {
         // params = gameNumber
-        if (params.length >= 1) {
-            int gameNumber = Integer.parseInt(params[0]);
-            int gameID = gameNumberTogameID.get(gameNumber);
+        if (params.length == 1) {
+            int gameNumber;
+            try {
+                gameNumber = Integer.parseInt(params[0]);
+            } catch (NumberFormatException e) {
+                throw new ResponseException(400, "Usage: observegame <game#>\n");
+            }
+            int gameID;
+            try {
+                gameID = gameNumberTogameID.get(gameNumber);
+            } catch (NullPointerException e) {
+                throw new ResponseException(400, "Game does not exist\nUsage: observegame <game#>\n");
+            }
 
             return "Observing game " + gameNumber + "\n";
         }
