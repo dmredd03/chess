@@ -4,9 +4,8 @@ import dataaccess.*;
 import model.Model;
 import org.junit.jupiter.api.*;
 import server.Server;
-import serverFacade.ServerFacade;
+import serverfacade.ServerFacade;
 import service.ClearService;
-import ui.*;
 
 import java.sql.SQLException;
 import static org.junit.jupiter.api.Assertions.*;

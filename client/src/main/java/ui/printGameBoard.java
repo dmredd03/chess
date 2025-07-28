@@ -1,13 +1,10 @@
 package ui;
 
-import ui.EscapeSequences;
-
-public class printGameboard {
-    private String CURR_BG_COLOR;
-    private String CURR_TEXT_COLOR;
-    private String HEADER_BG_COLOR = EscapeSequences.SET_BG_COLOR_RED;
-    private String HEADER_TEXT_COLOR = EscapeSequences.SET_TEXT_COLOR_BLUE;
-    private String HEADER_SPACE = "\u2003\u2003";
+public class printGameBoard {
+    private static String CURR_BG_COLOR;
+    private static String CURR_TEXT_COLOR;
+    private static String HEADER_BG_COLOR = EscapeSequences.SET_BG_COLOR_RED;
+    private static String HEADER_TEXT_COLOR = EscapeSequences.SET_TEXT_COLOR_BLUE;
 
     public void printBoardWhite() {
         printHeader();

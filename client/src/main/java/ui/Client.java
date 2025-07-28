@@ -1,11 +1,9 @@
 package ui;
 
-import chess.ChessGame;
 import model.Model;
-import serverFacade.ResponseException;
-import serverFacade.ServerFacade;
+import serverfacade.ResponseException;
+import serverfacade.ServerFacade;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -196,7 +194,7 @@ public class Client {
 
 
     public String gameplayEval(String input) {
-        // try { TODO: for future gameplayImplementation
+        // try {
             var tokens = input.toLowerCase().split(" ");
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
@@ -204,9 +202,7 @@ public class Client {
                 case "quit" -> "quit";
                 default -> "quit";
             };
-        // } catch (ResponseException e) {
-            // return e.getMessage();
-        // }
+
     }
 
 
