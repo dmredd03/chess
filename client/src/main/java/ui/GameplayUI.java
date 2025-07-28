@@ -25,8 +25,6 @@ public class GameplayUI {
                 }
             } else {
                 gameboard.printBoardWhite();
-                System.out.print("\n");
-                gameboard.printBoardBlack();
             }
             System.out.print("\n");
 
