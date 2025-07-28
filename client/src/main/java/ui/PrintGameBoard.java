@@ -1,10 +1,10 @@
 package ui;
 
-public class printGameBoard {
-    private static String CURR_BG_COLOR;
-    private static String CURR_TEXT_COLOR;
-    private static String HEADER_BG_COLOR = EscapeSequences.SET_BG_COLOR_RED;
-    private static String HEADER_TEXT_COLOR = EscapeSequences.SET_TEXT_COLOR_BLUE;
+public class PrintGameBoard {
+    private static String currBgColor;
+    private static String currTextColor;
+    private static final String HEADER_BG_COLOR = EscapeSequences.SET_BG_COLOR_RED;
+    private static final String HEADER_TEXT_COLOR = EscapeSequences.SET_TEXT_COLOR_BLUE;
 
     public void printBoardWhite() {
         printHeader();
@@ -13,9 +13,9 @@ public class printGameBoard {
         System.out.print(HEADER_BG_COLOR);
         System.out.print(" 8 ");
         System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
-        CURR_BG_COLOR = EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
+        currBgColor = EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
         System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE);
-        CURR_TEXT_COLOR = EscapeSequences.SET_TEXT_COLOR_BLUE;
+        currTextColor = EscapeSequences.SET_TEXT_COLOR_BLUE;
         System.out.print(EscapeSequences.BLACK_ROOK);
         alternateTileColor();
         System.out.print(EscapeSequences.BLACK_KNIGHT);
@@ -34,7 +34,7 @@ public class printGameBoard {
 
         printVerticalNum(8, -1);
 
-        System.out.print(CURR_BG_COLOR + CURR_TEXT_COLOR);
+        System.out.print(currBgColor + currTextColor);
         for (int i = 1; i <= 8; i++) {
             System.out.print(EscapeSequences.BLACK_PAWN);
             alternateTileColor();
@@ -52,7 +52,7 @@ public class printGameBoard {
         printVerticalNum(3, -1);
 
         alternateTeamColor();
-        System.out.print(CURR_BG_COLOR + CURR_TEXT_COLOR);
+        System.out.print(currBgColor + currTextColor);
         for (int i = 1; i <= 8; i++) {
             System.out.print(EscapeSequences.WHITE_PAWN);
             alternateTileColor();
@@ -60,7 +60,7 @@ public class printGameBoard {
         alternateTileColor();
         printVerticalNum(2, -1);
 
-        System.out.print(CURR_BG_COLOR + CURR_TEXT_COLOR);
+        System.out.print(currBgColor + currTextColor);
         System.out.print(EscapeSequences.WHITE_ROOK);
         alternateTileColor();
         System.out.print(EscapeSequences.WHITE_KNIGHT);
@@ -92,9 +92,9 @@ public class printGameBoard {
         System.out.print(" 1 ");
 
         System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
-        CURR_BG_COLOR = EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
+        currBgColor = EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
         System.out.print(EscapeSequences.SET_TEXT_COLOR_RED);
-        CURR_TEXT_COLOR = EscapeSequences.SET_TEXT_COLOR_RED;
+        currTextColor = EscapeSequences.SET_TEXT_COLOR_RED;
 
         System.out.print(EscapeSequences.WHITE_ROOK);
         alternateTileColor();
@@ -114,7 +114,7 @@ public class printGameBoard {
 
         printVerticalNum(1, 1);
 
-        System.out.print(CURR_BG_COLOR + CURR_TEXT_COLOR);
+        System.out.print(currBgColor + currTextColor);
         for (int i = 1; i <= 8; i++) {
             System.out.print(EscapeSequences.WHITE_PAWN);
             alternateTileColor();
@@ -132,7 +132,7 @@ public class printGameBoard {
         printVerticalNum(6, 1);
 
         alternateTeamColor();
-        System.out.print(CURR_BG_COLOR + CURR_TEXT_COLOR);
+        System.out.print(currBgColor + currTextColor);
         for (int i = 1; i <= 8; i++) {
             System.out.print(EscapeSequences.BLACK_PAWN);
             alternateTileColor();
@@ -140,7 +140,7 @@ public class printGameBoard {
         alternateTileColor();
         printVerticalNum(7, 1);
 
-        System.out.print(CURR_BG_COLOR + CURR_TEXT_COLOR);
+        System.out.print(currBgColor + currTextColor);
         // Black pieces, reversed order
         System.out.print(EscapeSequences.BLACK_ROOK);
         alternateTileColor();
@@ -179,21 +179,21 @@ public class printGameBoard {
     }
 
     private void alternateTileColor() {
-        if (CURR_BG_COLOR.equals(EscapeSequences.SET_BG_COLOR_LIGHT_GREY)) {
-            CURR_BG_COLOR = EscapeSequences.SET_BG_COLOR_BLACK;
+        if (currBgColor.equals(EscapeSequences.SET_BG_COLOR_LIGHT_GREY)) {
+            currBgColor = EscapeSequences.SET_BG_COLOR_BLACK;
         } else {
-            CURR_BG_COLOR = EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
+            currBgColor = EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
         }
-        System.out.print(CURR_BG_COLOR);
+        System.out.print(currBgColor);
     }
 
     private void alternateTeamColor() {
-        if (CURR_TEXT_COLOR.equals(EscapeSequences.SET_TEXT_COLOR_BLUE)) {
-            CURR_TEXT_COLOR = EscapeSequences.SET_TEXT_COLOR_RED;
+        if (currTextColor.equals(EscapeSequences.SET_TEXT_COLOR_BLUE)) {
+            currTextColor = EscapeSequences.SET_TEXT_COLOR_RED;
         } else {
-            CURR_TEXT_COLOR = EscapeSequences.SET_TEXT_COLOR_BLUE;
+            currTextColor = EscapeSequences.SET_TEXT_COLOR_BLUE;
         }
-        System.out.print(CURR_TEXT_COLOR);
+        System.out.print(currTextColor);
     }
 
     private void printVerticalNum(int currLine, int dir) {
@@ -209,7 +209,7 @@ public class printGameBoard {
     }
 
     private void printBlankLine() {
-        System.out.print(CURR_BG_COLOR + CURR_TEXT_COLOR);
+        System.out.print(currBgColor + currTextColor);
         for (int i = 1; i <= 8; i++) {
             System.out.print(EscapeSequences.EMPTY);
             alternateTileColor();

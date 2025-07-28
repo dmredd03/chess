@@ -4,7 +4,7 @@ import java.util.Scanner;
 
 public class GameplayUI {
     public final Client client;
-    private final printGameBoard gameboard = new printGameBoard();
+    private final PrintGameBoard gameboard = new PrintGameBoard();
 
     public GameplayUI(Client client) {
         this.client = client;
