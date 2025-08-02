@@ -1,5 +1,6 @@
 package websocketServer;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
@@ -8,6 +9,9 @@ import org.eclipse.jetty.websocket.client.io.ConnectionManager;
 import spark.Spark;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 
@@ -34,8 +38,16 @@ public class WebSocketHandler {
         try {
             String username = new dataaccess.AuthSQLDAO().getUserByAuth(command.getAuthToken());
             connections.add(username, session);
-            // notify players
-        } catch ()
+            ChessGame game = new dataaccess.GameSQLDAO().getGame(command.getGameID()).game();
+            // notify observers
+            LoadGameMessage loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
+            connections.directBroadcast(username, loadGameMessage);
+            String notificationConnection = String.format("%s is now observing", username);
+            var message = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, notificationConnection);
+            connections.broadcast(username, message);
+        } catch (Exception e) {
+
+        }
     }
 
     private void makeMove(UserGameCommand command) {
