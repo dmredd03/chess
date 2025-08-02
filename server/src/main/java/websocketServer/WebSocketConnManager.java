@@ -4,7 +4,7 @@ import org.eclipse.jetty.websocket.api.Session;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-public class WebsocketConnManager {
+public class WebSocketConnManager {
     public final ConcurrentHashMap<String, Connection> connections = new ConcurrentHashMap<>();
 
     public void add(String username, Session session) {
