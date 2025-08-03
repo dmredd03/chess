@@ -43,7 +43,7 @@ public class WebSocketHandler {
     private void connect(ConnectCommand command, Session session) throws IOException {
         try {
             String username = new dataaccess.AuthSQLDAO().getUserByAuth(command.getAuthToken());
-            connections.add(username, session);
+            connections.add(command.getGameID(), username, session);
             ChessGame game = new dataaccess.GameSQLDAO().getGame(command.getGameID()).game();
 
             // notify
@@ -52,12 +52,12 @@ public class WebSocketHandler {
             if (loadGameMessage.getColor().equals("observer")) {
                 notificationConnection = String.format("%s is now observing", username);
             } else if (loadGameMessage.getColor().equals("WHITE")) {
-                notificationConnection = String.format("%s joined game as white");
+                notificationConnection = String.format("%s joined game as white", username);
             } else {
-                notificationConnection = String.format("%s joined game as black");
+                notificationConnection = String.format("%s joined game as black", username);
             }
             var message = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, notificationConnection);
-            connections.broadcast(username, message);
+            connections.broadcast(command.getGameID(), username, message);
         } catch (DataAccessException | SQLException e) {
             throw new IOException("Error: unable to connect");
         }

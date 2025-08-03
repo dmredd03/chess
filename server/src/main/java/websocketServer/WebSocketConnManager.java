@@ -9,40 +9,46 @@ import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class WebSocketConnManager {
-    public final ConcurrentHashMap<String, Connection> connections = new ConcurrentHashMap<>();
+    public final ConcurrentHashMap<Integer, ConcurrentHashMap<String, Connection>> connections = new ConcurrentHashMap<>();
 
-    public void add(String username, Session session) {
+    public void add(int gameID, String username, Session session) {
         var connection = new Connection(username, session);
-        connections.put(username, connection);
+        connections
+                .computeIfAbsent(gameID, k -> new ConcurrentHashMap<>())
+                .put(username, connection);
     }
 
-    public void remove(String username) {
-        connections.remove(username);
+    public void remove(int gameID, String username) {
+        ConcurrentHashMap<String, Connection> connectionGameSpecific = connections.get(gameID);
+        if (connectionGameSpecific != null) {
+            connectionGameSpecific.remove(username);
+            if (connectionGameSpecific.isEmpty()) {
+                connections.remove(gameID);
+            }
+        }
     }
 
-    public void broadcast(String excludeUser, ServerMessage message) throws IOException {
-        var removeList = new ArrayList<Connection>();
-        for (var c : connections.values()) {
+    public void broadcast(int gameID, String excludeUser, ServerMessage message) throws IOException {
+        ConcurrentHashMap<String, Connection> connectionGameSpecific = connections.get(gameID);
+        if (connectionGameSpecific == null) return;
+
+        ArrayList<String> removeList = new ArrayList<>();
+        for (var c : connectionGameSpecific.values()) {
             if (c.session.isOpen()) {
                 if (!c.username.equals(excludeUser)) {
                     c.send(new Gson().toJson(message));
                 }
             } else {
-                removeList.add(c);
+                removeList.add(c.username);
             }
         }
 
-        for (var c : removeList) {
-            connections.remove(c.username);
+        for (String username : removeList) {
+            connectionGameSpecific.remove(username);
+        }
+        if (connectionGameSpecific.isEmpty()) {
+            connections.remove(gameID);
         }
     }
 
-    public void directBroadcast(String user, ServerMessage message) throws IOException {
-        var currConnection = connections.get(user);
-        if (currConnection.session.isOpen()) {
-            currConnection.send(new Gson().toJson(message));
-        } else {
-            throw new IOException("Error: unable to broadcast to user");
-        }
-    }
 }
