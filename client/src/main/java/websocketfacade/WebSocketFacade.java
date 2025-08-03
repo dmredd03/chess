@@ -2,6 +2,8 @@ package websocketfacade;
 
 import com.google.gson.Gson;
 import serverfacade.ResponseException;
+import websocket.commands.ConnectCommand;
+import websocket.commands.UserGameCommand;
 
 import javax.websocket.*;
 import java.io.IOException;
@@ -42,5 +44,13 @@ public class WebSocketFacade extends Endpoint {
     }
 
     // Add functions here
+    public void connect(String authToken, int gameID, String color) throws ResponseException {
+        try {
+            var cmd = new ConnectCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID, color);
+            this.session.getBasicRemote().sendText(new Gson().toJson(cmd));
+        } catch (IOException e) {
+            throw new ResponseException(500, e.getMessage());
+        }
+    }
 
 }

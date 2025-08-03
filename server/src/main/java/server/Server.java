@@ -4,6 +4,7 @@ import dataaccess.*;
 import org.eclipse.jetty.server.Authentication;
 import spark.*;
 import handler.HandlerLogic;
+import websocketServer.WebSocketHandler;
 
 
 public class Server {
@@ -11,8 +12,11 @@ public class Server {
     private AuthSQLDAO authDAO;
     private GameSQLDAO gameDAO;
 
+    private websocketServer.WebSocketHandler webSocketHandler;
+
     public int run(int desiredPort) {
         Spark.port(desiredPort);
+        webSocketHandler = new WebSocketHandler();
 
         Spark.staticFiles.location("web");
 
@@ -41,6 +45,8 @@ public class Server {
     }
 
     private void createRoutes() {
+        Spark.webSocket("/ws", webSocketHandler);
+
         Spark.post("/user", new HandlerLogic(userDAO, authDAO, gameDAO));
         Spark.post("/session", new HandlerLogic(userDAO, authDAO, gameDAO));
         Spark.delete("/session", new HandlerLogic(userDAO, authDAO, gameDAO));

@@ -3,7 +3,9 @@ package ui;
 import model.Model;
 import serverfacade.ResponseException;
 import serverfacade.ServerFacade;
+import websocketfacade.WebSocketFacade;
 
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,10 +15,13 @@ public class Client {
     private final ServerFacade server;
     private String authorization;
     private Map<Integer, Integer> gameNumberTogameID = new HashMap<>(); // gameNumber, gameID
+    private WebSocketFacade ws;
+    private String serverUrl;
 
     public Client(String serverUrl) {
         gameNumberTogameID = new HashMap<>();
         server = new ServerFacade(serverUrl);
+        this.serverUrl = serverUrl;
     }
 
     public String preloginEval(String input) {
@@ -166,6 +171,13 @@ public class Client {
             Model.JoinGameRequest request = new Model.JoinGameRequest(teamColor, gameID);
             server.joinGame(request);
 
+            try {
+                ws = new WebSocketFacade(serverUrl);
+                ws.connect(server.getAuthorization(), gameID, teamColor);
+            } catch (URISyntaxException e) {
+                throw new ResponseException(400, "Error: unable to connect");
+            }
+
             return "Joined game " + gameNumber + " as " + params[1] + "\n";
         }
         throw new ResponseException(400, "Usage: playgame <game#> <Color: (White or Black)>\n");
@@ -185,6 +197,12 @@ public class Client {
                 gameID = gameNumberTogameID.get(gameNumber);
             } catch (NullPointerException e) {
                 throw new ResponseException(400, "Game does not exist\nUsage: observegame <game#>\n");
+            }
+            try {
+                ws = new WebSocketFacade(serverUrl);
+                ws.connect(server.getAuthorization(), gameID, "observer");
+            } catch (URISyntaxException e) {
+                throw new ResponseException(400, "Error: Unable to connect");
             }
 
             return "Observing game " + gameNumber + "\n";
