@@ -3,6 +3,7 @@ package ui;
 import model.Model;
 import serverfacade.ResponseException;
 import serverfacade.ServerFacade;
+import websocketfacade.NotificationHandler;
 import websocketfacade.WebSocketFacade;
 
 import java.net.URISyntaxException;
@@ -17,11 +18,13 @@ public class Client {
     private Map<Integer, Integer> gameNumberTogameID = new HashMap<>(); // gameNumber, gameID
     private WebSocketFacade ws;
     private String serverUrl;
+    private NotificationHandler notificationHandler;
 
-    public Client(String serverUrl) {
+    public Client(String serverUrl, NotificationHandler notificationHandler) {
         gameNumberTogameID = new HashMap<>();
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
+        this.notificationHandler = notificationHandler;
     }
 
     public String preloginEval(String input) {
@@ -172,7 +175,7 @@ public class Client {
             server.joinGame(request);
 
             try {
-                ws = new WebSocketFacade(serverUrl);
+                ws = new WebSocketFacade(serverUrl, notificationHandler);
                 ws.connect(server.getAuthorization(), gameID, teamColor);
             } catch (URISyntaxException e) {
                 throw new ResponseException(400, "Error: unable to connect");
@@ -199,7 +202,7 @@ public class Client {
                 throw new ResponseException(400, "Game does not exist\nUsage: observegame <game#>\n");
             }
             try {
-                ws = new WebSocketFacade(serverUrl);
+                ws = new WebSocketFacade(serverUrl, notificationHandler);
                 ws.connect(server.getAuthorization(), gameID, "observer");
             } catch (URISyntaxException e) {
                 throw new ResponseException(400, "Error: Unable to connect");
@@ -222,6 +225,7 @@ public class Client {
             };
 
     }
+
 
 
 }

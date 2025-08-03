@@ -1,6 +1,7 @@
 package ui;
 
 import java.util.Scanner;
+import websocketfacade.NotificationHandler;
 
 public class GameplayUI {
     public final Client client;
@@ -43,5 +44,6 @@ public class GameplayUI {
             }
         }
     }
+
 
 }

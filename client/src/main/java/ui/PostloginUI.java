@@ -1,5 +1,7 @@
 package ui;
 
+import websocketfacade.NotificationHandler;
+
 import java.util.Scanner;
 
 public class PostloginUI {

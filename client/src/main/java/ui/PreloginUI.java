@@ -1,12 +1,17 @@
 package ui;
 
+import com.google.gson.Gson;
+import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
+import websocketfacade.NotificationHandler;
+
 import java.util.Scanner;
 
-public class PreloginUI {
+public class PreloginUI implements NotificationHandler {
     private final Client client;
 
     public PreloginUI(String serverUrl) {
-        client = new Client(serverUrl);
+        client = new Client(serverUrl, this);
     }
 
     public void run() {
@@ -35,5 +40,10 @@ public class PreloginUI {
 
     private void printPrompt() {
         System.out.print("Logged OUT: ");
+    }
+
+    public void notify(String message) {
+        var received = new Gson().fromJson(message, NotificationMessage.class);
+        System.out.println(received.getNotification());
     }
 }

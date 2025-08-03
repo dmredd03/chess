@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import serverfacade.ResponseException;
 import websocket.commands.ConnectCommand;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ServerMessage;
 
 import javax.websocket.*;
 import java.io.IOException;
@@ -15,11 +16,11 @@ public class WebSocketFacade extends Endpoint {
     Session session;
     NotificationHandler notificationHandler;
 
-    public WebSocketFacade(String url) throws ResponseException, URISyntaxException {
+    public WebSocketFacade(String url, NotificationHandler notificationHandler) throws ResponseException, URISyntaxException {
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");
-            // notification Handler?
+            this.notificationHandler = notificationHandler;
 
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
 
@@ -29,7 +30,7 @@ public class WebSocketFacade extends Endpoint {
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
-                    // Notification notification = new Gson().fromJson(message, Notification.class);
+                    ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
                     notificationHandler.notify(message);
                 }
             });
