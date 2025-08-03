@@ -40,7 +40,7 @@ public class WebSocketConnManager {
             UserRole key = entry.getKey();
             Connection c = entry.getValue();
             if (c.session.isOpen()) {
-                if (!key.username.equals(excludeUser) && key.role.equals(excludeColor)) {
+                if (!key.username.equals(excludeUser)) {
                     c.send(new Gson().toJson(message));
                 }
             } else {

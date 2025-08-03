@@ -79,7 +79,7 @@ public class WebSocketHandler {
             String color = command.getColor();
             connections.remove(command.getGameID(), username, color);
             if (!color.equals("observer")) {
-                new GameSQLDAO().updateGame(color, null, command.getGameID()); // should remove user from game
+                new GameSQLDAO().removeUserFromGame(color, username, command.getGameID()); // should remove user from game
             }
 
             //notify
