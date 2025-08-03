@@ -3,6 +3,7 @@ package websocketServer;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
+import dataaccess.GameSQLDAO;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
@@ -30,20 +31,25 @@ public class WebSocketHandler {
             case UserGameCommand.CommandType.CONNECT:
                 var connCommand = new Gson().fromJson(message, ConnectCommand.class);
                 connect(connCommand, session);
+                break;
             case UserGameCommand.CommandType.MAKE_MOVE:
                 var makeMoveCommand = new Gson().fromJson(message, MakeMoveCommand.class);
                 makeMove(makeMoveCommand);
+                break;
             case UserGameCommand.CommandType.LEAVE:
-                leave(command);
+                var exitCommand = new Gson().fromJson(message, ConnectCommand.class);
+                leave(exitCommand);
+                break;
             case UserGameCommand.CommandType.RESIGN:
                 resign(command);
+                break;
         }
     }
 
     private void connect(ConnectCommand command, Session session) throws IOException {
         try {
             String username = new dataaccess.AuthSQLDAO().getUserByAuth(command.getAuthToken());
-            connections.add(command.getGameID(), username, session);
+            connections.add(command.getGameID(), username, command.getColor(), session);
             ChessGame game = new dataaccess.GameSQLDAO().getGame(command.getGameID()).game();
 
             // notify
@@ -57,7 +63,7 @@ public class WebSocketHandler {
                 notificationConnection = String.format("%s joined game as black", username);
             }
             var message = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, notificationConnection);
-            connections.broadcast(command.getGameID(), username, message);
+            connections.broadcast(command.getGameID(), username, command.getColor(), message);
         } catch (DataAccessException | SQLException e) {
             throw new IOException("Error: unable to connect");
         }
@@ -67,8 +73,27 @@ public class WebSocketHandler {
 
     }
 
-    private void leave(UserGameCommand command) {
+    private void leave(ConnectCommand command) throws IOException {
+        try {
+            String username = new dataaccess.AuthSQLDAO().getUserByAuth(command.getAuthToken());
+            String color = command.getColor();
+            connections.remove(command.getGameID(), username, color);
+            if (!color.equals("observer")) {
+                new GameSQLDAO().updateGame(color, null, command.getGameID()); // should remove user from game
+            }
 
+            //notify
+            String notificationLeave;
+            if (command.getColor().equals("observer")) {
+                notificationLeave = String.format("%s has stopped observing game", username);
+            } else {
+                notificationLeave = String.format("%s has stopped playing", username);
+            }
+            var newMessage = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, notificationLeave);
+            connections.broadcast(command.getGameID(), username, color, newMessage);
+        } catch (DataAccessException | SQLException e) {
+            throw new IOException("Error: unable to leave game");
+        }
     }
 
     private void resign(UserGameCommand command) {

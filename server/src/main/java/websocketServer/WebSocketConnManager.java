@@ -8,43 +8,48 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class WebSocketConnManager {
-    public final ConcurrentHashMap<Integer, ConcurrentHashMap<String, Connection>> connections = new ConcurrentHashMap<>();
 
-    public void add(int gameID, String username, Session session) {
+public class WebSocketConnManager {
+    public final ConcurrentHashMap<Integer, ConcurrentHashMap<UserRole, Connection>> connections = new ConcurrentHashMap<>();
+
+    public void add(int gameID, String username, String color, Session session) {
+        UserRole key = new UserRole(username, color);
         var connection = new Connection(username, session);
         connections
                 .computeIfAbsent(gameID, k -> new ConcurrentHashMap<>())
-                .put(username, connection);
+                .put(key, connection);
     }
 
-    public void remove(int gameID, String username) {
-        ConcurrentHashMap<String, Connection> connectionGameSpecific = connections.get(gameID);
+    public void remove(int gameID, String username, String color) {
+        UserRole key = new UserRole(username, color);
+        ConcurrentHashMap<UserRole, Connection> connectionGameSpecific = connections.get(gameID);
         if (connectionGameSpecific != null) {
-            connectionGameSpecific.remove(username);
+            connectionGameSpecific.remove(key);
             if (connectionGameSpecific.isEmpty()) {
                 connections.remove(gameID);
             }
         }
     }
 
-    public void broadcast(int gameID, String excludeUser, ServerMessage message) throws IOException {
-        ConcurrentHashMap<String, Connection> connectionGameSpecific = connections.get(gameID);
+    public void broadcast(int gameID, String excludeUser, String excludeColor, ServerMessage message) throws IOException {
+        ConcurrentHashMap<UserRole, Connection> connectionGameSpecific = connections.get(gameID);
         if (connectionGameSpecific == null) return;
 
-        ArrayList<String> removeList = new ArrayList<>();
-        for (var c : connectionGameSpecific.values()) {
+        ArrayList<UserRole> removeList = new ArrayList<>();
+        for (var entry : connectionGameSpecific.entrySet()) {
+            UserRole key = entry.getKey();
+            Connection c = entry.getValue();
             if (c.session.isOpen()) {
-                if (!c.username.equals(excludeUser)) {
+                if (!key.username.equals(excludeUser) && key.role.equals(excludeColor)) {
                     c.send(new Gson().toJson(message));
                 }
             } else {
-                removeList.add(c.username);
+                removeList.add(key);
             }
         }
 
-        for (String username : removeList) {
-            connectionGameSpecific.remove(username);
+        for (UserRole key : removeList) {
+            connectionGameSpecific.remove(key);
         }
         if (connectionGameSpecific.isEmpty()) {
             connections.remove(gameID);

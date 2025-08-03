@@ -20,6 +20,9 @@ public class Client {
     private String serverUrl;
     private NotificationHandler notificationHandler;
 
+    private int currGameID;
+    private String currColor; // WHITE, BLACK, or observer
+
     public Client(String serverUrl, NotificationHandler notificationHandler) {
         gameNumberTogameID = new HashMap<>();
         server = new ServerFacade(serverUrl);
@@ -180,6 +183,8 @@ public class Client {
             } catch (URISyntaxException e) {
                 throw new ResponseException(400, "Error: unable to connect");
             }
+            currGameID = gameID;
+            currColor = teamColor;
 
             return "Joined game " + gameNumber + " as " + params[1] + "\n";
         }
@@ -208,6 +213,9 @@ public class Client {
                 throw new ResponseException(400, "Error: Unable to connect");
             }
 
+            currGameID = gameID;
+            currColor = "observer";
+
             return "Observing game " + gameNumber + "\n";
         }
         throw new ResponseException(400, "Usage: observegame <game#>\n");
@@ -215,15 +223,31 @@ public class Client {
 
 
     public String gameplayEval(String input) {
-        // try {
+        try {
             var tokens = input.toLowerCase().split(" ");
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
-                case "quit" -> "quit";
-                default -> "quit";
+                case "leave" -> leaveGame();
+                default -> gameplayHelp();
             };
+        } catch (ResponseException e) {
+            return e.getMessage();
+        }
+    }
 
+    private String gameplayHelp() {
+        return "Commands:\n" +
+                "redraw: Redraws chess board\n" +
+                "leave: leave the current game\n" +
+                "makemove <Piece position> <Move position>: move piece\n" +
+                "resign: give up\n" +
+                "highlight <Piece position>: highlight legal moves\n";
+    }
+
+    private String leaveGame() throws ResponseException {
+        ws.leave(server.getAuthorization(), currGameID, currColor);
+        return "quit";
     }
 
 
