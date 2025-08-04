@@ -1,6 +1,6 @@
 package ui;
 
-import chess.ChessGame;
+import chess.*;
 import model.Model;
 import serverfacade.ResponseException;
 import serverfacade.ServerFacade;
@@ -11,6 +11,7 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.*;
 
 public class Client {
 
@@ -230,6 +231,7 @@ public class Client {
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
                 case "leave" -> leaveGame();
+                case "makemove" -> makeMove(params);
                 default -> gameplayHelp();
             };
         } catch (ResponseException e) {
@@ -241,7 +243,7 @@ public class Client {
         return "Commands:\n" +
                 "redraw: Redraws chess board\n" +
                 "leave: leave the current game\n" +
-                "makemove <Piece position> <Move position>: move piece\n" +
+                "makemove <Piece position><Move position>: move piece\n" +
                 "resign: give up\n" +
                 "highlight <Piece position>: highlight legal moves\n";
     }
@@ -258,6 +260,33 @@ public class Client {
         } else {
             new PrintGameBoard().printBoardWhite(gameState);
         }
+    }
+
+    private String makeMove(String... params) throws ResponseException {
+        if (currColor.equals("observer")) { throw new ResponseException(500, "Error: Observer cannot make moves\n"); }
+
+        if (params.length == 1) {
+            Pattern pattern = Pattern.compile("([a-h][1-8])([a-h][1-8])");
+            Matcher matcher = pattern.matcher(params[0]);
+            if (!matcher.matches()) {
+                throw new ResponseException(400, "Error: Invalid position");
+            }
+            String from = matcher.group(1);
+            String to = matcher.group(2);
+
+            int fromCol = from.charAt(0) - 'a' + 1;
+            int fromRow = from.charAt(1) - '0';
+            ChessPosition startPos = new ChessPosition(fromRow, fromCol);
+            int toCol = from.charAt(0) - 'a' + 1;
+            int toRow = from.charAt(1) - '0' + 1;
+            ChessPosition endPos = new ChessPosition(toRow, toCol);
+            ChessMove newMove = new ChessMove(startPos, endPos, null);
+
+            ws.makemove(server.getAuthorization(), currGameID, newMove, currColor);
+
+            return "makeMove";
+        }
+        throw new ResponseException(400, "Usage: makemove <Piece position><Move position>\n[a-h][1-8][a-h][1-8]\n");
     }
 
 

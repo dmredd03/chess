@@ -1,6 +1,8 @@
 package websocketServer;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.GameSQLDAO;
@@ -12,12 +14,14 @@ import spark.Spark;
 import websocket.commands.ConnectCommand;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Collection;
 
 @WebSocket
 public class WebSocketHandler {
@@ -34,7 +38,7 @@ public class WebSocketHandler {
                 break;
             case UserGameCommand.CommandType.MAKE_MOVE:
                 var makeMoveCommand = new Gson().fromJson(message, MakeMoveCommand.class);
-                makeMove(makeMoveCommand);
+                makeMove(makeMoveCommand, session);
                 break;
             case UserGameCommand.CommandType.LEAVE:
                 var exitCommand = new Gson().fromJson(message, ConnectCommand.class);
@@ -71,8 +75,65 @@ public class WebSocketHandler {
         }
     }
 
-    private void makeMove(MakeMoveCommand command) {
+    private void makeMove(MakeMoveCommand command, Session session) throws IOException {
 
+        try {
+            // verify move is valid
+            String username = new dataaccess.AuthSQLDAO().getUserByAuth(command.getAuthToken());
+            String color = command.getColor();
+            ChessGame currGameState = new dataaccess.GameSQLDAO().getGame(command.getGameID()).game();
+            Collection<ChessMove> validMoves = currGameState.validMoves(command.getMove().getStartPosition());
+            if (validMoves == null || !validMoves.contains(command.getMove())) { //not a valid move
+                ErrorMessage invalidMoveError = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: Invalid move chosen");
+                connections.directBroadcast(command.getGameID(), username, color, invalidMoveError);
+                return;
+            }
+            // move is valid, try to make move, should throw if wrong turn, into check, etc.
+            try {
+                currGameState.makeMove(command.getMove());
+            } catch (InvalidMoveException e) {
+                ErrorMessage invalidMoveError = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: Invalid move chosen");
+                connections.directBroadcast(command.getGameID(), username, color, invalidMoveError);
+                return;
+            }
+            // update game state in db
+            new dataaccess.GameSQLDAO().updateGameState(command.getGameID(), currGameState);
+
+            // send Load_game message to all clients
+            LoadGameMessage updatedBoardMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, currGameState, "ignore");
+            connections.broadcast(command.getGameID(), "", "", updatedBoardMessage);
+
+            // Send notification message to all other clients
+            char startCol = (char) ('a' + command.getMove().getStartPosition().getColumn());
+            int startRow = command.getMove().getStartPosition().getRow();
+            char endCol = (char) ('a' + command.getMove().getEndPosition().getColumn());
+            int endRow = command.getMove().getEndPosition().getRow();
+            String notification = String.format("%s moved from %c%d to %c%d", username, startCol, startRow, endCol, endRow);
+            NotificationMessage notifyMoveMade = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification);
+            connections.broadcast(command.getGameID(), username, command.getColor(), notifyMoveMade);
+
+            // if move results in check, checkmate, or stalemate, send notification to all clients
+            String checkCheckmateStalemate = "";
+            if (currGameState.isInStalemate(ChessGame.TeamColor.WHITE)) {
+                checkCheckmateStalemate = "STALEMATE!!\n";
+            } else if (currGameState.isInCheckmate(ChessGame.TeamColor.WHITE)) {
+                checkCheckmateStalemate = "White is in checkmate\n";
+            } else if (currGameState.isInCheckmate(ChessGame.TeamColor.BLACK)) {
+                checkCheckmateStalemate = "Black is in checkmate\n";
+            } else if (currGameState.isInCheck(ChessGame.TeamColor.WHITE)) {
+                checkCheckmateStalemate = "White is in check\n";
+            } else if (currGameState.isInCheck(ChessGame.TeamColor.BLACK)) {
+                checkCheckmateStalemate = "Black is in check\n";
+            }
+
+            if (!checkCheckmateStalemate.isEmpty()) {
+                NotificationMessage gameStatusNotify = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, checkCheckmateStalemate);
+                connections.broadcast(command.getGameID(), "", "", gameStatusNotify);
+            }
+
+        } catch (SQLException | DataAccessException e) {
+            throw new IOException("Error: unable to connect");
+        }
     }
 
     private void leave(ConnectCommand command) throws IOException {

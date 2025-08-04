@@ -166,6 +166,35 @@ public class GameSQLDAO implements GameDAO {
     }
 
 
+    public void updateGameState(int gameID, ChessGame newGameState) throws DataAccessException {
+        try (var connection = DatabaseManager.getConnection()) {
+            var statement = "UPDATE gameData SET game = ? WHERE gameID = ?";
+            try (var ps = connection.prepareStatement(statement)) {
+                String gsonGame = new Gson().toJson(newGameState);
+                ps.setString(1, gsonGame);
+                ps.setInt(2, gameID);
+                int rows = ps.executeUpdate();
+                if (rows == 0) { throw new DataAccessException("No game found with gameID"); }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to update game", e);
+        }
+    }
+
+    public void deleteGame(int gameID) throws DataAccessException, SQLException {
+        try (var connection = DatabaseManager.getConnection()) {
+            var statement = "DELETE FROM gameData WHERE gameID = ?";
+            try (var ps = connection.prepareStatement(statement)) {
+                ps.setInt(1, gameID);
+                int rows = ps.executeUpdate();
+                if (rows == 0) {
+                    throw new DataAccessException("No game found with gameID");
+                }
+            }
+        }
+    }
+
+
     String gameTableCreation = """
             CREATE TABLE IF NOT EXISTS  gameData (
             gameID int NOT NULL PRIMARY KEY,
