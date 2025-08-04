@@ -33,7 +33,7 @@ public class WebSocketConnManager {
 
     public void broadcast(int gameID, String excludeUser, String excludeColor, ServerMessage message) throws IOException {
         ConcurrentHashMap<UserRole, Connection> connectionGameSpecific = connections.get(gameID);
-        if (connectionGameSpecific == null) return;
+        if (connectionGameSpecific == null) { return; }
 
         ArrayList<UserRole> removeList = new ArrayList<>();
         for (var entry : connectionGameSpecific.entrySet()) {
@@ -53,6 +53,16 @@ public class WebSocketConnManager {
         }
         if (connectionGameSpecific.isEmpty()) {
             connections.remove(gameID);
+        }
+    }
+
+    public void directBroadcast(int gameID, String username, String color, ServerMessage message) throws IOException {
+        ConcurrentHashMap<UserRole, Connection> connectionGameSpecific = connections.get(gameID);
+        if (connectionGameSpecific == null) { return; }
+        UserRole key = new UserRole(username, color);
+        Connection c = connectionGameSpecific.get(key);
+        if (c != null && c.session.isOpen()) {
+            c.send(new Gson().toJson(message));
         }
     }
 

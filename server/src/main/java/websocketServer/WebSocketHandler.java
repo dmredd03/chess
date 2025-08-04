@@ -52,12 +52,14 @@ public class WebSocketHandler {
             connections.add(command.getGameID(), username, command.getColor(), session);
             ChessGame game = new dataaccess.GameSQLDAO().getGame(command.getGameID()).game();
 
-            // notify
+            // send loadgame message to user
             LoadGameMessage loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game, command.getColor());
+            connections.directBroadcast(command.getGameID(), username, command.getColor(), loadGameMessage);
+            // notify other users
             String notificationConnection;
-            if (loadGameMessage.getColor().equals("observer")) {
+            if (command.getColor().equals("observer")) {
                 notificationConnection = String.format("%s is now observing", username);
-            } else if (loadGameMessage.getColor().equals("WHITE")) {
+            } else if (command.getColor().equals("WHITE")) {
                 notificationConnection = String.format("%s joined game as white", username);
             } else {
                 notificationConnection = String.format("%s joined game as black", username);

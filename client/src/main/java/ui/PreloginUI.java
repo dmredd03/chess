@@ -1,6 +1,9 @@
 package ui;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 import websocketfacade.NotificationHandler;
@@ -43,7 +46,23 @@ public class PreloginUI implements NotificationHandler {
     }
 
     public void notify(String message) {
-        var received = new Gson().fromJson(message, NotificationMessage.class);
-        System.out.println(received.getNotification());
+
+        JsonObject json = JsonParser.parseString(message).getAsJsonObject();
+        String type = json.get("serverMessageType").getAsString();
+
+        switch (type) {
+            case "LOAD_GAME" -> {
+                LoadGameMessage loadGameMessage = new Gson().fromJson(message, LoadGameMessage.class);
+                client.loadGameRedraw(loadGameMessage.getChessGame());
+            }
+            case "NOTIFICATION" -> {
+                var received = new Gson().fromJson(message, NotificationMessage.class);
+                System.out.println(received.getNotification());
+            }
+            case "ERROR" -> {
+                var error = new Gson().fromJson(message, NotificationMessage.class);
+                System.out.println(error.getNotification());
+            }
+        }
     }
 }

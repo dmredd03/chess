@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessGame;
 import model.Model;
 import serverfacade.ResponseException;
 import serverfacade.ServerFacade;
@@ -248,6 +249,15 @@ public class Client {
     private String leaveGame() throws ResponseException {
         ws.leave(server.getAuthorization(), currGameID, currColor);
         return "quit";
+    }
+
+    // called when loadgame signal is received through websocket
+    public void loadGameRedraw(ChessGame gameState) {
+        if (currColor.equals("BLACK")) {
+            new PrintGameBoard().printBoardBlack(gameState);
+        } else {
+            new PrintGameBoard().printBoardWhite(gameState);
+        }
     }
 
 

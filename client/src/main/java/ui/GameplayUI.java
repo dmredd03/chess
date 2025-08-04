@@ -16,20 +16,7 @@ public class GameplayUI {
         Scanner scanner = new Scanner(System.in);
         var result = "";
         while (true) {
-            if (inputResult.contains("Joined")) {
-                if (playerColor.equals("WHITE")) {
-                    // print white board
-                    // gameboard.printBoardWhite();
-                } else {
-                    // print black board
-                    // gameboard.printBoardBlack();
-                }
-            } else {
-                // gameboard.printBoardWhite();
-            }
             System.out.print("\n");
-
-
             String line = scanner.nextLine();
             try {
                 result = client.gameplayEval(line);
