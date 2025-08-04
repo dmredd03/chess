@@ -19,13 +19,13 @@ public class GameplayUI {
             if (inputResult.contains("Joined")) {
                 if (playerColor.equals("WHITE")) {
                     // print white board
-                    gameboard.printBoardWhite();
+                    // gameboard.printBoardWhite();
                 } else {
                     // print black board
-                    gameboard.printBoardBlack();
+                    // gameboard.printBoardBlack();
                 }
             } else {
-                gameboard.printBoardWhite();
+                // gameboard.printBoardWhite();
             }
             System.out.print("\n");
 
