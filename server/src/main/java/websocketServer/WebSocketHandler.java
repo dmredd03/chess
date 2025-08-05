@@ -82,6 +82,7 @@ public class WebSocketHandler {
             String username = new dataaccess.AuthSQLDAO().getUserByAuth(command.getAuthToken());
             String color = command.getColor();
             ChessGame currGameState = new dataaccess.GameSQLDAO().getGame(command.getGameID()).game();
+            if (gameEndCheck(command.getGameID(), username, color, currGameState)) { return;  } // checks if game has ended already
             Collection<ChessMove> validMoves = currGameState.validMoves(command.getMove().getStartPosition());
             if (validMoves == null || !validMoves.contains(command.getMove())) { //not a valid move
                 ErrorMessage invalidMoveError = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: Invalid move chosen");
@@ -104,9 +105,9 @@ public class WebSocketHandler {
             connections.broadcast(command.getGameID(), "", "", updatedBoardMessage);
 
             // Send notification message to all other clients
-            char startCol = (char) ('a' + command.getMove().getStartPosition().getColumn() + 1);
+            char startCol = (char) ('a' + command.getMove().getStartPosition().getColumn() - 1);
             int startRow = command.getMove().getStartPosition().getRow();
-            char endCol = (char) ('a' + command.getMove().getEndPosition().getColumn() + 1);
+            char endCol = (char) ('a' + command.getMove().getEndPosition().getColumn() - 1);
             int endRow = command.getMove().getEndPosition().getRow();
             String notification = String.format("%s moved from %c%d to %c%d", username, startCol, startRow, endCol, endRow);
             NotificationMessage notifyMoveMade = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification);
@@ -115,13 +116,15 @@ public class WebSocketHandler {
             // if move results in check, checkmate, or stalemate, send notification to all clients
             String checkCheckmateStalemate = "";
             if (currGameState.isInStalemate(ChessGame.TeamColor.WHITE)) {
-                checkCheckmateStalemate = "STALEMATE!!\n";
+                checkCheckmateStalemate = "White is in STALEMATE\nGAME END";
+            } else if (currGameState.isInStalemate(ChessGame.TeamColor.BLACK)) {
+                checkCheckmateStalemate = "Black is in STALEMATE\nGAME END";
             } else if (currGameState.isInCheckmate(ChessGame.TeamColor.WHITE)) {
-                checkCheckmateStalemate = "White is in checkmate\n";
+                checkCheckmateStalemate = "White is in CHECKMATE\nGAME END";
             } else if (currGameState.isInCheckmate(ChessGame.TeamColor.BLACK)) {
-                checkCheckmateStalemate = "Black is in checkmate\n";
+                checkCheckmateStalemate = "Black is in CHECKMATE\nGAME END";
             } else if (currGameState.isInCheck(ChessGame.TeamColor.WHITE)) {
-                checkCheckmateStalemate = "White is in check\n";
+                checkCheckmateStalemate = "White is in check\nGAME END";
             } else if (currGameState.isInCheck(ChessGame.TeamColor.BLACK)) {
                 checkCheckmateStalemate = "Black is in check\n";
             }
@@ -134,6 +137,18 @@ public class WebSocketHandler {
         } catch (SQLException | DataAccessException e) {
             throw new IOException("Error: unable to connect");
         }
+    }
+
+    private Boolean gameEndCheck(int gameID, String username, String color, ChessGame currGameState) throws IOException {
+        if (currGameState.isInCheckmate(ChessGame.TeamColor.WHITE) ||
+                currGameState.isInCheckmate(ChessGame.TeamColor.BLACK) ||
+                currGameState.isInStalemate(ChessGame.TeamColor.WHITE) ||
+                currGameState.isInStalemate(ChessGame.TeamColor.BLACK)) {
+            ErrorMessage gameOverError = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: Game finished");
+            connections.directBroadcast(gameID, username, color, gameOverError);
+            return true;
+        }
+        return false;
     }
 
     private void leave(ConnectCommand command) throws IOException {
