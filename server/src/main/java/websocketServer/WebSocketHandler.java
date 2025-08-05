@@ -104,9 +104,9 @@ public class WebSocketHandler {
             connections.broadcast(command.getGameID(), "", "", updatedBoardMessage);
 
             // Send notification message to all other clients
-            char startCol = (char) ('a' + command.getMove().getStartPosition().getColumn());
+            char startCol = (char) ('a' + command.getMove().getStartPosition().getColumn() + 1);
             int startRow = command.getMove().getStartPosition().getRow();
-            char endCol = (char) ('a' + command.getMove().getEndPosition().getColumn());
+            char endCol = (char) ('a' + command.getMove().getEndPosition().getColumn() + 1);
             int endRow = command.getMove().getEndPosition().getRow();
             String notification = String.format("%s moved from %c%d to %c%d", username, startCol, startRow, endCol, endRow);
             NotificationMessage notifyMoveMade = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification);

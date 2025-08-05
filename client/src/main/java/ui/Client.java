@@ -277,8 +277,8 @@ public class Client {
             int fromCol = from.charAt(0) - 'a' + 1;
             int fromRow = from.charAt(1) - '0';
             ChessPosition startPos = new ChessPosition(fromRow, fromCol);
-            int toCol = from.charAt(0) - 'a' + 1;
-            int toRow = from.charAt(1) - '0' + 1;
+            int toCol = to.charAt(0) - 'a' + 1;
+            int toRow = to.charAt(1) - '0';
             ChessPosition endPos = new ChessPosition(toRow, toCol);
             ChessMove newMove = new ChessMove(startPos, endPos, null);
 
