@@ -24,6 +24,7 @@ public class Client {
 
     private int currGameID;
     private String currColor; // WHITE, BLACK, or observer
+    private ChessGame currGameState; // stores gameState for redraw and other functions
 
     public Client(String serverUrl, NotificationHandler notificationHandler) {
         gameNumberTogameID = new HashMap<>();
@@ -232,6 +233,7 @@ public class Client {
             return switch (cmd) {
                 case "leave" -> leaveGame();
                 case "makemove" -> makeMove(params);
+                case "redraw" -> redrawBoard();
                 default -> gameplayHelp();
             };
         } catch (ResponseException e) {
@@ -255,6 +257,7 @@ public class Client {
 
     // called when loadgame signal is received through websocket
     public void loadGameRedraw(ChessGame gameState) {
+        currGameState = gameState.copy();
         if (currColor.equals("BLACK")) {
             new PrintGameBoard().printBoardBlack(gameState);
         } else {
@@ -289,6 +292,19 @@ public class Client {
         throw new ResponseException(400, "Usage: makemove <Piece position><Move position>\n[a-h][1-8][a-h][1-8]\n");
     }
 
+    private String redrawBoard() throws ResponseException {
+        if (currGameState != null) {
+            if (currColor.equals("BLACK")) {
+                new PrintGameBoard().printBoardBlack(currGameState);
+            } else {
+                new PrintGameBoard().printBoardWhite(currGameState);
+            }
+        } else {
+            throw new ResponseException(500, "Error: Board not received from websocket");
+        }
+
+        return "";
+    }
 
 
 }
