@@ -10,6 +10,7 @@ import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.eclipse.jetty.websocket.client.io.ConnectionManager;
+import server.Server;
 import spark.Spark;
 import websocket.commands.ConnectCommand;
 import websocket.commands.MakeMoveCommand;
@@ -45,7 +46,7 @@ public class WebSocketHandler {
                 leave(exitCommand);
                 break;
             case UserGameCommand.CommandType.RESIGN:
-                resign(command);
+                resign(command, session);
                 break;
         }
     }
@@ -143,7 +144,8 @@ public class WebSocketHandler {
         if (currGameState.isInCheckmate(ChessGame.TeamColor.WHITE) ||
                 currGameState.isInCheckmate(ChessGame.TeamColor.BLACK) ||
                 currGameState.isInStalemate(ChessGame.TeamColor.WHITE) ||
-                currGameState.isInStalemate(ChessGame.TeamColor.BLACK)) {
+                currGameState.isInStalemate(ChessGame.TeamColor.BLACK) ||
+                currGameState.getGameFinished()) {
             ErrorMessage gameOverError = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: Game finished");
             connections.directBroadcast(gameID, username, color, gameOverError);
             return true;
@@ -174,8 +176,21 @@ public class WebSocketHandler {
         }
     }
 
-    private void resign(UserGameCommand command) {
+    private void resign(UserGameCommand command, Session session) throws IOException {
+        try {
+            String username = new dataaccess.AuthSQLDAO().getUserByAuth(command.getAuthToken());
+            ChessGame currGameState = new dataaccess.GameSQLDAO().getGame(command.getGameID()).game();
+            currGameState.setGameFinished(true);
+            new dataaccess.GameSQLDAO().updateGameState(command.getGameID(), currGameState);
 
+            String resignText = String.format("%s has resigned\nGAME END", username);
+            NotificationMessage message = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, resignText);
+            connections.broadcast(command.getGameID(), "", "", message);
+
+
+        } catch (DataAccessException | SQLException e) {
+            throw new IOException("Error: bad resign request");
+        }
     }
 
 

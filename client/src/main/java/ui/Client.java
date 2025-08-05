@@ -11,6 +11,7 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.regex.*;
 
 public class Client {
@@ -234,6 +235,7 @@ public class Client {
                 case "leave" -> leaveGame();
                 case "makemove" -> makeMove(params);
                 case "redraw" -> redrawBoard();
+                case "resign" -> resignGame();
                 default -> gameplayHelp();
             };
         } catch (ResponseException e) {
@@ -304,6 +306,22 @@ public class Client {
         }
 
         return "";
+    }
+
+    private String resignGame() throws ResponseException {
+        System.out.println("Are you sure you want to resign? (Y/n)");
+        while (true) {
+            Scanner scanner = new Scanner(System.in);
+            String line = scanner.nextLine();
+            if (line.equals("Y")) {
+                ws.resign(server.getAuthorization(), currGameID);
+                return "Thanks for playing!";
+            } else if (line.equals("n")) {
+                return "continue";
+            } else {
+                System.out.println("Usage: (Y/n)");
+            }
+        }
     }
 
 

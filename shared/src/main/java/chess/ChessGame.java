@@ -14,6 +14,7 @@ import java.util.Objects;
 public class ChessGame {
     private ChessBoard gameBoard;
     private TeamColor teamTurn;
+    private Boolean gameFinished = false;
     public ChessGame() {
         this.gameBoard = new ChessBoard();
         gameBoard.resetBoard();
@@ -332,6 +333,13 @@ public class ChessGame {
         if (newRow >= 1 && newRow <= 8 && newCol >= 1 && newCol <= 8) {
             attacks.add(new ChessMove(from, new ChessPosition(newRow, newCol), null));
         }
+    }
+
+    public void setGameFinished(Boolean gameState) {
+        gameFinished = gameState;
+    }
+    public Boolean getGameFinished() {
+        return gameFinished;
     }
 
     @Override
