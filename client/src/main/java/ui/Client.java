@@ -236,6 +236,7 @@ public class Client {
                 case "makemove" -> makeMove(params);
                 case "redraw" -> redrawBoard();
                 case "resign" -> resignGame();
+                case "highlight" -> highlightGame(params);
                 default -> gameplayHelp();
             };
         } catch (ResponseException e) {
@@ -322,6 +323,24 @@ public class Client {
                 System.out.println("Usage: (Y/n)");
             }
         }
+    }
+
+    private String highlightGame(String... params) throws ResponseException {
+        if (params.length == 1) {
+            Pattern pattern = Pattern.compile("[a-h][1-8]");
+            Matcher matcher = pattern.matcher(params[0]);
+            if (!matcher.matches()) {
+                throw new ResponseException(500, "Improper position syntax. Usage: highlight [a-h][1-8]");
+            }
+            int col = params[0].charAt(0) - 'a';
+            int row = params[0].charAt(1) - '0';
+            ChessPosition testPos = new ChessPosition(row, col);
+
+            new PrintGameBoard().highlightPrintBoard(currGameState, testPos, currColor);
+
+            return "highlighted possible moves of piece at " + params[0];
+        }
+        throw new ResponseException(500, "Usage: highlight <piecePosition>");
     }
 
 

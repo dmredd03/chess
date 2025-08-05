@@ -2,6 +2,9 @@ package ui;
 
 import chess.*;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 public class PrintGameBoard {
     private static String currBgColor;
     private static String currTextColor;
@@ -9,6 +12,8 @@ public class PrintGameBoard {
     private static final String HEADER_TEXT_COLOR = EscapeSequences.SET_TEXT_COLOR_BLUE;
     private ChessBoard board;
     private ChessGame.TeamColor perspective;
+    private Boolean highlighting = false;
+    private Collection<ChessPosition> highlightPosition = new ArrayList<>();
 
     public void printBoardWhite(ChessGame currGame) {
         board = currGame.getBoard();
@@ -25,9 +30,9 @@ public class PrintGameBoard {
             for (int col = 1; col <= 8; col++) {
                 ChessPiece currPiece = board.getPiece(new ChessPosition(row, col));
                 if (currPiece == null) {
-                    printCurrBlankSpace(col);
+                    printCurrBlankSpace(col, row);
                 } else {
-                    printCurrSpace(currPiece, col);
+                    printCurrSpace(currPiece, col, row);
                 }
             }
             printVerticalNum(row, -1);
@@ -37,7 +42,7 @@ public class PrintGameBoard {
         System.out.print(EscapeSequences.RESET_BG_COLOR + EscapeSequences.RESET_TEXT_COLOR + "\n");
     }
 
-    private void printCurrSpace(ChessPiece currPiece, int col) {
+    private void printCurrSpace(ChessPiece currPiece, int col, int row) {
         if (currPiece.getTeamColor() == ChessGame.TeamColor.WHITE) {
             currTextColor = EscapeSequences.SET_TEXT_COLOR_RED;
             System.out.print(currTextColor);
@@ -63,18 +68,18 @@ public class PrintGameBoard {
         }
 
         if ((col != 8 && perspective.equals(ChessGame.TeamColor.WHITE))) {
-            alternateTileColor();
+            alternateTileColor(new ChessPosition(row, col));
         } else if (col != 1 && perspective.equals(ChessGame.TeamColor.BLACK)) {
-            alternateTileColor();
+            alternateTileColor(new ChessPosition(row, col));
         }
     }
 
-    private void printCurrBlankSpace(int col){
+    private void printCurrBlankSpace(int col, int row){
         System.out.print(EscapeSequences.EMPTY);
         if (col != 8 && perspective.equals(ChessGame.TeamColor.WHITE)) {
-            alternateTileColor();
+            alternateTileColor(new ChessPosition(row, col));
         } else if (col != 1 && perspective.equals(ChessGame.TeamColor.BLACK)) {
-            alternateTileColor();
+            alternateTileColor(new ChessPosition(row, col));
         }
     }
 
@@ -95,9 +100,9 @@ public class PrintGameBoard {
             for (int col = 8; col >= 1; col--) {
                 ChessPiece currPiece = board.getPiece(new ChessPosition(row, col));
                 if (currPiece == null) {
-                    printCurrBlankSpace(col);
+                    printCurrBlankSpace(col, row);
                 } else {
-                    printCurrSpace(currPiece, col);
+                    printCurrSpace(currPiece, col, row);
                 }
             }
             printVerticalNum(row, 1);
@@ -119,23 +124,34 @@ public class PrintGameBoard {
         System.out.print(EscapeSequences.EMPTY + " h  g   f   e  d   c  b   a    ");
     }
 
-    private void alternateTileColor() {
-        if (currBgColor.equals(EscapeSequences.SET_BG_COLOR_LIGHT_GREY)) {
-            currBgColor = EscapeSequences.SET_BG_COLOR_BLACK;
+    private void alternateTileColor(ChessPosition currPos) {
+
+        if (highlighting && highlightPosition != null && highlightPosition.contains(currPos)) {
+            // Print highlighted space (choose color based on currBgColor)
+            if (currBgColor.equals(EscapeSequences.SET_BG_COLOR_LIGHT_GREY) ||
+            currBgColor.equals(EscapeSequences.SET_BG_COLOR_GREEN)) {
+                // print dark space highlighted
+                currBgColor = EscapeSequences.SET_BG_COLOR_DARK_GREEN;
+            } else {
+                // print light space highlighted
+                currBgColor = EscapeSequences.SET_BG_COLOR_GREEN;
+            }
         } else {
-            currBgColor = EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
+            if (currBgColor.equals(EscapeSequences.SET_BG_COLOR_LIGHT_GREY) ||
+            currBgColor.equals(EscapeSequences.SET_BG_COLOR_GREEN)) {
+                currBgColor = EscapeSequences.SET_BG_COLOR_BLACK;
+            } else {
+                currBgColor = EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
+            }
         }
         System.out.print(currBgColor);
+
+
+
+
     }
 
-    private void alternateTeamColor() {
-        if (currTextColor.equals(EscapeSequences.SET_TEXT_COLOR_BLUE)) {
-            currTextColor = EscapeSequences.SET_TEXT_COLOR_RED;
-        } else {
-            currTextColor = EscapeSequences.SET_TEXT_COLOR_BLUE;
-        }
-        System.out.print(currTextColor);
-    }
+
 
     private void printVerticalNum(int currLine, int dir) {
         System.out.print(HEADER_BG_COLOR + HEADER_TEXT_COLOR);
@@ -149,14 +165,31 @@ public class PrintGameBoard {
         }
     }
 
-    private void printBlankLine() {
-        System.out.print(currBgColor + currTextColor);
-        for (int i = 1; i <= 8; i++) {
-            System.out.print(EscapeSequences.EMPTY);
-            alternateTileColor();
+
+    public void highlightPrintBoard(ChessGame currGame, ChessPosition testPos, String color) {
+        board = currGame.getBoard();
+        if (board.getPiece(testPos) == null) {
+            System.out.print("Error: piece not found");
+            return;
         }
-        alternateTileColor();
+        Collection<ChessMove> movesToHighlight = new ArrayList<>();
+        movesToHighlight = currGame.validMoves(testPos);
+        if (movesToHighlight != null && !movesToHighlight.isEmpty()) {
+            for (ChessMove validMove : movesToHighlight) {
+               highlightPosition.add(validMove.getEndPosition());
+            }
+        }
+        highlighting = true;
+        if (color.equals("BLACK")) {
+            printBoardBlack(currGame);
+        } else {
+            printBoardWhite(currGame);
+        }
+        highlighting = false;
+        highlightPosition.clear();
     }
+
+
 
 
 }
