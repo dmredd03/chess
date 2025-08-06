@@ -310,13 +310,14 @@ public class Client {
     }
 
     private String resignGame() throws ResponseException {
+        if (currColor.equals("observer")) { return "Error: observer cannot resign"; }
         System.out.println("Are you sure you want to resign? (Y/n)");
         while (true) {
             Scanner scanner = new Scanner(System.in);
             String line = scanner.nextLine();
             if (line.equals("Y")) {
                 ws.resign(server.getAuthorization(), currGameID, currColor);
-                return "Thanks for playing!";
+                return "";
             } else if (line.equals("n")) {
                 return "continue";
             } else {
