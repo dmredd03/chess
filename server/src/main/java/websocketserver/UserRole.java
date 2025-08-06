@@ -1,4 +1,4 @@
-package websocketServer;
+package websocketserver;
 
 import java.util.Objects;
 

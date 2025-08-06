@@ -132,33 +132,32 @@ public class GameSQLDAO implements GameDAO {
     public void removeUserFromGame(String playerColor, String username, int gameID) throws DataAccessException, SQLException {
         try (var conn = DatabaseManager.getConnection()) {
             String statement = "SELECT whiteUsername, blackUsername FROM gameData WHERE gameID = ?";
-            try (var ps = conn.prepareStatement(statement)) {
-                ps.setInt(1, gameID);
-                try (var rs = ps.executeQuery()) {
-                    if (!rs.next()) {
-                        throw new DataAccessException("Game not found");
-                    }
-                    String whiteUsername = rs.getString("whiteUsername");
-                    String blackUsername = rs.getString("blackUsername");
+            var ps = conn.prepareStatement(statement);
+            ps.setInt(1, gameID);
+            try (var rs = ps.executeQuery()) {
+                if (!rs.next()) {
+                    throw new DataAccessException("Game not found");
+                }
+                String whiteUsername = rs.getString("whiteUsername");
+                String blackUsername = rs.getString("blackUsername");
 
-                    String updateSql = null;
-                    switch (playerColor.toUpperCase()) {
-                        case "WHITE":
-                            if (username.equals(whiteUsername)) {
-                                updateSql = "UPDATE gameData SET whiteUsername = NULL WHERE gameID = ?";
-                            }
-                            break;
-                        case "BLACK":
-                            if (username.equals(blackUsername)) {
-                                updateSql = "UPDATE gameData SET blackUsername = NULL WHERE gameID = ?";
-                            }
-                            break;
-                    }
-                    if (updateSql != null) {
-                        try (var ups = conn.prepareStatement(updateSql)) {
-                            ups.setInt(1, gameID);
-                            ups.executeUpdate();
+                String updateSql = null;
+                switch (playerColor.toUpperCase()) {
+                    case "WHITE":
+                        if (username.equals(whiteUsername)) {
+                            updateSql = "UPDATE gameData SET whiteUsername = NULL WHERE gameID = ?";
                         }
+                        break;
+                    case "BLACK":
+                        if (username.equals(blackUsername)) {
+                            updateSql = "UPDATE gameData SET blackUsername = NULL WHERE gameID = ?";
+                        }
+                        break;
+                }
+                if (updateSql != null) {
+                    try (var ups = conn.prepareStatement(updateSql)) {
+                        ups.setInt(1, gameID);
+                        ups.executeUpdate();
                     }
                 }
             }
@@ -178,19 +177,6 @@ public class GameSQLDAO implements GameDAO {
             }
         } catch (SQLException e) {
             throw new DataAccessException("Failed to update game", e);
-        }
-    }
-
-    public void deleteGame(int gameID) throws DataAccessException, SQLException {
-        try (var connection = DatabaseManager.getConnection()) {
-            var statement = "DELETE FROM gameData WHERE gameID = ?";
-            try (var ps = connection.prepareStatement(statement)) {
-                ps.setInt(1, gameID);
-                int rows = ps.executeUpdate();
-                if (rows == 0) {
-                    throw new DataAccessException("No game found with gameID");
-                }
-            }
         }
     }
 

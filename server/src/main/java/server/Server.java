@@ -1,10 +1,9 @@
 package server;
 
 import dataaccess.*;
-import org.eclipse.jetty.server.Authentication;
 import spark.*;
 import handler.HandlerLogic;
-import websocketServer.WebSocketHandler;
+import websocketserver.WebSocketHandler;
 
 
 public class Server {
@@ -12,7 +11,7 @@ public class Server {
     private AuthSQLDAO authDAO;
     private GameSQLDAO gameDAO;
 
-    private websocketServer.WebSocketHandler webSocketHandler;
+    private websocketserver.WebSocketHandler webSocketHandler;
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);

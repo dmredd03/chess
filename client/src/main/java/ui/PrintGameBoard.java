@@ -83,16 +83,6 @@ public class PrintGameBoard {
         }
     }
 
-    private void printCurrBlankSpace(int col, int row){
-        System.out.print(EscapeSequences.EMPTY);
-        if (col != 8 && perspective.equals(ChessGame.TeamColor.WHITE)) {
-            alternateTileColor(new ChessPosition(row, col));
-        } else if (col != 1 && perspective.equals(ChessGame.TeamColor.BLACK)) {
-            alternateTileColor(new ChessPosition(row, col));
-        }
-    }
-
-
     public void printBoardBlack(ChessGame currGame) {
         board = currGame.getBoard();
         perspective = ChessGame.TeamColor.BLACK;
@@ -168,18 +158,6 @@ public class PrintGameBoard {
         }
         System.out.print(currBgColor);
     }
-
-    private String getTileBgColor(ChessPosition currPos) {
-        if (highlighting && highlightPosition != null && highlightPosition.contains(currPos)) {
-            return currBgColor.equals(EscapeSequences.SET_BG_COLOR_LIGHT_GREY)
-                    ? EscapeSequences.SET_BG_COLOR_GREEN
-                    : EscapeSequences.SET_BG_COLOR_DARK_GREEN;
-        } else {
-            return currBgColor;
-        }
-    }
-
-
 
     private void printVerticalNum(int currLine, int dir) {
         System.out.print(HEADER_BG_COLOR + HEADER_TEXT_COLOR);

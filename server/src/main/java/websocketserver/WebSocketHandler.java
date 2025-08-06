@@ -1,4 +1,4 @@
-package websocketServer;
+package websocketserver;
 
 import chess.ChessGame;
 import chess.ChessMove;
@@ -9,9 +9,6 @@ import dataaccess.GameSQLDAO;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
-import org.eclipse.jetty.websocket.client.io.ConnectionManager;
-import server.Server;
-import spark.Spark;
 import websocket.commands.ConnectCommand;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.ResignCommand;
@@ -22,7 +19,6 @@ import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
-import java.io.UTFDataFormatException;
 import java.sql.SQLException;
 import java.util.Collection;
 
