@@ -136,28 +136,6 @@ public class PrintGameBoard {
         System.out.print(EscapeSequences.EMPTY + " h  g   f   e  d   c  b   a    ");
     }
 
-    private void alternateTileColor(ChessPosition currPos) {
-
-        if (highlighting && highlightPosition != null && highlightPosition.contains(currPos)) {
-            // Print highlighted space (choose color based on currBgColor)
-            if (currBgColor.equals(EscapeSequences.SET_BG_COLOR_LIGHT_GREY) ||
-            currBgColor.equals(EscapeSequences.SET_BG_COLOR_GREEN)) {
-                // print dark space highlighted
-                currBgColor = EscapeSequences.SET_BG_COLOR_DARK_GREEN;
-            } else {
-                // print light space highlighted
-                currBgColor = EscapeSequences.SET_BG_COLOR_GREEN;
-            }
-        } else {
-            if (currBgColor.equals(EscapeSequences.SET_BG_COLOR_LIGHT_GREY) ||
-            currBgColor.equals(EscapeSequences.SET_BG_COLOR_GREEN)) {
-                currBgColor = EscapeSequences.SET_BG_COLOR_BLACK;
-            } else {
-                currBgColor = EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
-            }
-        }
-        System.out.print(currBgColor);
-    }
 
     private void printVerticalNum(int currLine, int dir) {
         System.out.print(HEADER_BG_COLOR + HEADER_TEXT_COLOR);
