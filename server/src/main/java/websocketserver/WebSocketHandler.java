@@ -140,17 +140,23 @@ public class WebSocketHandler {
             // if move results in check, checkmate, or stalemate, send notification to all clients
             String checkCheckmateStalemate = "";
             if (currGameState.isInStalemate(ChessGame.TeamColor.WHITE)) {
-                checkCheckmateStalemate = "White is in STALEMATE\nGAME END";
+                checkCheckmateStalemate = String.format("%s is in STALEMATE\nGAME END",
+                        connections.getUsernameByColor(command.getGameID(), "WHITE"));
             } else if (currGameState.isInStalemate(ChessGame.TeamColor.BLACK)) {
-                checkCheckmateStalemate = "Black is in STALEMATE\nGAME END";
+                checkCheckmateStalemate = String.format("%s is in STALEMATE\nGAME END",
+                        connections.getUsernameByColor(command.getGameID(), "BLACK"));
             } else if (currGameState.isInCheckmate(ChessGame.TeamColor.WHITE)) {
-                checkCheckmateStalemate = "White is in CHECKMATE\nGAME END";
+                checkCheckmateStalemate = String.format("%s is in CHECKMATE\nGAME END",
+                        connections.getUsernameByColor(command.getGameID(), "WHITE"));
             } else if (currGameState.isInCheckmate(ChessGame.TeamColor.BLACK)) {
-                checkCheckmateStalemate = "Black is in CHECKMATE\nGAME END";
+                checkCheckmateStalemate = String.format("%s is in CHECKMATE\nGAME END",
+                        connections.getUsernameByColor(command.getGameID(), "BLACK"));
             } else if (currGameState.isInCheck(ChessGame.TeamColor.WHITE)) {
-                checkCheckmateStalemate = "White is in check\nGAME END";
+                checkCheckmateStalemate = String.format("%s is in check",
+                        connections.getUsernameByColor(command.getGameID(), "WHITE"));
             } else if (currGameState.isInCheck(ChessGame.TeamColor.BLACK)) {
-                checkCheckmateStalemate = "Black is in check\n";
+                checkCheckmateStalemate = String.format("%s is in check",
+                        connections.getUsernameByColor(command.getGameID(), "BLACK"));;
             }
 
             if (!checkCheckmateStalemate.isEmpty()) {
@@ -162,7 +168,6 @@ public class WebSocketHandler {
             var errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, e.getMessage());
             Gson gson = new Gson();
             session.getRemote().sendString(gson.toJson(errorMessage));
-            throw new IOException("Error: unable to connect");
         }
     }
 
@@ -231,7 +236,6 @@ public class WebSocketHandler {
             var errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, e.getMessage());
             Gson gson = new Gson();
             session.getRemote().sendString(gson.toJson(errorMessage));
-            throw new IOException("Error: bad resign request");
         }
     }
 

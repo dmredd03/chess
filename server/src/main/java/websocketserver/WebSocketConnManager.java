@@ -66,4 +66,15 @@ public class WebSocketConnManager {
         }
     }
 
+    public String getUsernameByColor(int gameID, String color) {
+        ConcurrentHashMap<UserRole, Connection> connectionGameSpecific = connections.get(gameID);
+        if (connectionGameSpecific == null) { return null; }
+        for (UserRole role : connectionGameSpecific.keySet()) {
+            if (role.role.equals(color)) {
+                return role.username;
+            }
+        }
+        return null;
+    }
+
 }

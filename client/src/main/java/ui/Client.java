@@ -286,13 +286,46 @@ public class Client {
             int toCol = to.charAt(0) - 'a' + 1;
             int toRow = to.charAt(1) - '0';
             ChessPosition endPos = new ChessPosition(toRow, toCol);
-            ChessMove newMove = new ChessMove(startPos, endPos, null);
+            // add pawn functionality here
+            ChessPiece.PieceType promotionPiece = promotionCheck(startPos, endPos);
+            ChessMove newMove = new ChessMove(startPos, endPos, promotionPiece);
 
             ws.makemove(server.getAuthorization(), currGameID, newMove, currColor);
 
             return "makeMove";
         }
         throw new ResponseException(400, "Usage: makemove <Piece position><Move position>\n[a-h][1-8][a-h][1-8]\n");
+    }
+
+
+    private ChessPiece.PieceType promotionCheck(ChessPosition startPos, ChessPosition endPos) {
+        ChessPiece piece = currGameState.getBoard().getPiece(startPos);
+        if (piece == null) { return null; }
+        if (piece.getPieceType() != ChessPiece.PieceType.PAWN ) { return null; }
+
+        if (piece.getTeamColor() == ChessGame.TeamColor.WHITE && currColor.equals("WHITE") && endPos.getRow() == 8) {
+            return promotionPrompt();
+        }
+        if (piece.getTeamColor() == ChessGame.TeamColor.BLACK && currColor.equals("BLACK") && endPos.getRow() == 1) {
+            return promotionPrompt();
+        }
+
+        return null;
+    }
+
+    private ChessPiece.PieceType promotionPrompt() {
+        while (true) {
+            System.out.print("What piece would you like to promote to? (Q|R|N|B)\n");
+            Scanner scanner = new Scanner(System.in);
+            String line = scanner.nextLine();
+            switch (line.toLowerCase()) {
+                case ("q") -> { return ChessPiece.PieceType.QUEEN; }
+                case ("r") -> { return ChessPiece.PieceType.ROOK; }
+                case ("n") -> { return ChessPiece.PieceType.KNIGHT; }
+                case ("b") -> { return ChessPiece.PieceType.BISHOP; }
+                default -> System.out.println("Usage: (Q|R|N|B)");
+            }
+        }
     }
 
     private String redrawBoard() throws ResponseException {
