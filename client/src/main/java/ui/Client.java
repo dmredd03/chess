@@ -332,7 +332,7 @@ public class Client {
             if (!matcher.matches()) {
                 throw new ResponseException(500, "Improper position syntax. Usage: highlight [a-h][1-8]");
             }
-            int col = params[0].charAt(0) - 'a';
+            int col = params[0].charAt(0) - 'a' + 1;
             int row = params[0].charAt(1) - '0';
             ChessPosition testPos = new ChessPosition(row, col);
 

@@ -27,13 +27,28 @@ public class PrintGameBoard {
         System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
         currBgColor = EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
         for (int row = 8; row >= 1; row--) {
+            currBgColor = (row % 2 == 0) ? EscapeSequences.SET_BG_COLOR_LIGHT_GREY : EscapeSequences.SET_BG_COLOR_BLACK;
+
             for (int col = 1; col <= 8; col++) {
-                ChessPiece currPiece = board.getPiece(new ChessPosition(row, col));
+                ChessPosition currPos = new ChessPosition(row, col);
+                if (highlighting && highlightPosition != null && highlightPosition.contains(currPos)) {
+                    System.out.print(currBgColor.equals(EscapeSequences.SET_BG_COLOR_LIGHT_GREY)
+                            ? EscapeSequences.SET_BG_COLOR_GREEN
+                            : EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                } else {
+                    System.out.print(currBgColor);
+                }
+
+                ChessPiece currPiece = board.getPiece(currPos);
                 if (currPiece == null) {
-                    printCurrBlankSpace(col, row);
+                    System.out.print(EscapeSequences.EMPTY);
                 } else {
                     printCurrSpace(currPiece, col, row);
                 }
+
+                currBgColor = currBgColor.equals(EscapeSequences.SET_BG_COLOR_LIGHT_GREY)
+                        ? EscapeSequences.SET_BG_COLOR_BLACK
+                        : EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
             }
             printVerticalNum(row, -1);
             System.out.print(currBgColor);
@@ -66,12 +81,6 @@ public class PrintGameBoard {
                 case ChessPiece.PieceType.KING -> System.out.print(EscapeSequences.BLACK_KING);
             }
         }
-
-        if ((col != 8 && perspective.equals(ChessGame.TeamColor.WHITE))) {
-            alternateTileColor(new ChessPosition(row, col));
-        } else if (col != 1 && perspective.equals(ChessGame.TeamColor.BLACK)) {
-            alternateTileColor(new ChessPosition(row, col));
-        }
     }
 
     private void printCurrBlankSpace(int col, int row){
@@ -97,13 +106,26 @@ public class PrintGameBoard {
         currBgColor = EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
 
         for (int row = 1; row <= 8; row++) {
+            currBgColor = (row % 2 == 1) ? EscapeSequences.SET_BG_COLOR_LIGHT_GREY : EscapeSequences.SET_BG_COLOR_BLACK;
             for (int col = 8; col >= 1; col--) {
+                ChessPosition currPos = new ChessPosition(row, col);
+                if (highlighting && highlightPosition != null && highlightPosition.contains(currPos)) {
+                    System.out.print(currBgColor.equals(EscapeSequences.SET_BG_COLOR_LIGHT_GREY)
+                            ? EscapeSequences.SET_BG_COLOR_GREEN
+                            : EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                } else {
+                    System.out.print(currBgColor);
+                }
+
                 ChessPiece currPiece = board.getPiece(new ChessPosition(row, col));
                 if (currPiece == null) {
-                    printCurrBlankSpace(col, row);
+                    System.out.print(EscapeSequences.EMPTY);
                 } else {
                     printCurrSpace(currPiece, col, row);
                 }
+                currBgColor = currBgColor.equals(EscapeSequences.SET_BG_COLOR_LIGHT_GREY)
+                        ? EscapeSequences.SET_BG_COLOR_BLACK
+                        : EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
             }
             printVerticalNum(row, 1);
             System.out.print(currBgColor);
@@ -145,10 +167,16 @@ public class PrintGameBoard {
             }
         }
         System.out.print(currBgColor);
+    }
 
-
-
-
+    private String getTileBgColor(ChessPosition currPos) {
+        if (highlighting && highlightPosition != null && highlightPosition.contains(currPos)) {
+            return currBgColor.equals(EscapeSequences.SET_BG_COLOR_LIGHT_GREY)
+                    ? EscapeSequences.SET_BG_COLOR_GREEN
+                    : EscapeSequences.SET_BG_COLOR_DARK_GREEN;
+        } else {
+            return currBgColor;
+        }
     }
 
 
