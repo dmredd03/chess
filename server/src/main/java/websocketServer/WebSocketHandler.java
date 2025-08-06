@@ -54,24 +54,35 @@ public class WebSocketHandler {
     private void connect(ConnectCommand command, Session session) throws IOException {
         try {
             String username = new dataaccess.AuthSQLDAO().getUserByAuth(command.getAuthToken());
-            connections.add(command.getGameID(), username, command.getColor(), session);
             ChessGame game = new dataaccess.GameSQLDAO().getGame(command.getGameID()).game();
+            String color;
+            if (command.getColor() == null) {
+                color = autoAssign(username);
+            } else {
+                color = command.getColor();
+            }
+
+            connections.add(command.getGameID(), username, color, session);
+
 
             // send loadgame message to user
             LoadGameMessage loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game, command.getColor());
-            connections.directBroadcast(command.getGameID(), username, command.getColor(), loadGameMessage);
+            connections.directBroadcast(command.getGameID(), username, color, loadGameMessage);
             // notify other users
             String notificationConnection;
-            if (command.getColor().equals("observer")) {
-                notificationConnection = String.format("%s is now observing", username);
-            } else if (command.getColor().equals("WHITE")) {
-                notificationConnection = String.format("%s joined game as white", username);
+            if (color.equals("observer")) {
+                notificationConnection = String.format("message: %s is now observing", username);
+            } else if (color.equals("WHITE")) {
+                notificationConnection = String.format("message: %s joined game as white", username);
             } else {
-                notificationConnection = String.format("%s joined game as black", username);
+                notificationConnection = String.format("message: %s joined game as black", username);
             }
             var message = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, notificationConnection);
-            connections.broadcast(command.getGameID(), username, command.getColor(), message);
-        } catch (DataAccessException | SQLException e) {
+            connections.broadcast(command.getGameID(), username, color, message);
+        } catch (DataAccessException | SQLException | NullPointerException e) {
+            var errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: Bad Authorization");
+            Gson gson = new Gson();
+            session.getRemote().sendString(gson.toJson(errorMessage));
             throw new IOException("Error: unable to connect");
         }
     }
@@ -190,6 +201,16 @@ public class WebSocketHandler {
 
         } catch (DataAccessException | SQLException e) {
             throw new IOException("Error: bad resign request");
+        }
+    }
+
+    private String autoAssign(String username) {
+        if (username.contains("white")) {
+            return "WHITE";
+        } else if (username.contains("black")) {
+            return "BLACK";
+        } else {
+            return "observer";
         }
     }
 
