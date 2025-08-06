@@ -3,9 +3,7 @@ package websocketfacade;
 import chess.*;
 import com.google.gson.Gson;
 import serverfacade.ResponseException;
-import websocket.commands.ConnectCommand;
-import websocket.commands.MakeMoveCommand;
-import websocket.commands.UserGameCommand;
+import websocket.commands.*;
 import websocket.messages.ServerMessage;
 
 import javax.websocket.*;
@@ -75,9 +73,9 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
-    public void resign(String authToken, Integer gameID) throws ResponseException {
+    public void resign(String authToken, Integer gameID, String color) throws ResponseException {
         try {
-            var cmd = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID);
+            var cmd = new ResignCommand(authToken, gameID, color);
             this.session.getBasicRemote().sendText(new Gson().toJson(cmd));
         } catch (IOException e) {
             throw new ResponseException(500, e.getMessage());

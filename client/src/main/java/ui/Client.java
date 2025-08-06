@@ -315,7 +315,7 @@ public class Client {
             Scanner scanner = new Scanner(System.in);
             String line = scanner.nextLine();
             if (line.equals("Y")) {
-                ws.resign(server.getAuthorization(), currGameID);
+                ws.resign(server.getAuthorization(), currGameID, currColor);
                 return "Thanks for playing!";
             } else if (line.equals("n")) {
                 return "continue";

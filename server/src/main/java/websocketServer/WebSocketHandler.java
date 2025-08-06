@@ -14,6 +14,7 @@ import server.Server;
 import spark.Spark;
 import websocket.commands.ConnectCommand;
 import websocket.commands.MakeMoveCommand;
+import websocket.commands.ResignCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
@@ -21,6 +22,7 @@ import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
+import java.io.UTFDataFormatException;
 import java.sql.SQLException;
 import java.util.Collection;
 
@@ -46,7 +48,8 @@ public class WebSocketHandler {
                 leave(exitCommand);
                 break;
             case UserGameCommand.CommandType.RESIGN:
-                resign(command, session);
+                var resignCommand = new Gson().fromJson(message, ResignCommand.class);
+                resign(resignCommand, session);
                 break;
         }
     }
@@ -66,7 +69,7 @@ public class WebSocketHandler {
 
 
             // send loadgame message to user
-            LoadGameMessage loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game, command.getColor());
+            LoadGameMessage loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game, color);
             connections.directBroadcast(command.getGameID(), username, color, loadGameMessage);
             // notify other users
             String notificationConnection;
@@ -92,7 +95,16 @@ public class WebSocketHandler {
         try {
             // verify move is valid
             String username = new dataaccess.AuthSQLDAO().getUserByAuth(command.getAuthToken());
-            String color = command.getColor();
+
+            String color;
+            if (command.getColor() == null) {
+                color = autoAssign(username);
+            } else {
+                color = command.getColor();
+            }
+
+            if (color.equals("observer")) { throw new DataAccessException("Error: Can't make moves as observer"); }
+
             ChessGame currGameState = new dataaccess.GameSQLDAO().getGame(command.getGameID()).game();
             if (gameEndCheck(command.getGameID(), username, color, currGameState)) { return;  } // checks if game has ended already
             Collection<ChessMove> validMoves = currGameState.validMoves(command.getMove().getStartPosition());
@@ -100,6 +112,10 @@ public class WebSocketHandler {
                 ErrorMessage invalidMoveError = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: Invalid move chosen");
                 connections.directBroadcast(command.getGameID(), username, color, invalidMoveError);
                 return;
+            }
+
+            if (!currGameState.getTeamTurn().toString().equals(color)) {
+                throw new DataAccessException("Error: Not your turn");
             }
             // move is valid, try to make move, should throw if wrong turn, into check, etc.
             try {
@@ -123,7 +139,7 @@ public class WebSocketHandler {
             int endRow = command.getMove().getEndPosition().getRow();
             String notification = String.format("%s moved from %c%d to %c%d", username, startCol, startRow, endCol, endRow);
             NotificationMessage notifyMoveMade = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification);
-            connections.broadcast(command.getGameID(), username, command.getColor(), notifyMoveMade);
+            connections.broadcast(command.getGameID(), username, color, notifyMoveMade);
 
             // if move results in check, checkmate, or stalemate, send notification to all clients
             String checkCheckmateStalemate = "";
@@ -147,6 +163,9 @@ public class WebSocketHandler {
             }
 
         } catch (SQLException | DataAccessException e) {
+            var errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, e.getMessage());
+            Gson gson = new Gson();
+            session.getRemote().sendString(gson.toJson(errorMessage));
             throw new IOException("Error: unable to connect");
         }
     }
@@ -167,7 +186,12 @@ public class WebSocketHandler {
     private void leave(ConnectCommand command) throws IOException {
         try {
             String username = new dataaccess.AuthSQLDAO().getUserByAuth(command.getAuthToken());
-            String color = command.getColor();
+            String color;
+            if (command.getColor() == null) {
+                color = autoAssign(username);
+            } else {
+                color = command.getColor();
+            }
             connections.remove(command.getGameID(), username, color);
             if (!color.equals("observer")) {
                 new GameSQLDAO().removeUserFromGame(color, username, command.getGameID()); // should remove user from game
@@ -175,7 +199,7 @@ public class WebSocketHandler {
 
             //notify
             String notificationLeave;
-            if (command.getColor().equals("observer")) {
+            if (color.equals("observer")) {
                 notificationLeave = String.format("%s has stopped observing game", username);
             } else {
                 notificationLeave = String.format("%s has stopped playing", username);
@@ -187,10 +211,18 @@ public class WebSocketHandler {
         }
     }
 
-    private void resign(UserGameCommand command, Session session) throws IOException {
+    private void resign(ResignCommand command, Session session) throws IOException {
         try {
             String username = new dataaccess.AuthSQLDAO().getUserByAuth(command.getAuthToken());
             ChessGame currGameState = new dataaccess.GameSQLDAO().getGame(command.getGameID()).game();
+            if (currGameState.getGameFinished()) { throw new DataAccessException("Error: Game already ended"); }
+            String color;
+            if (command.getColor() == null) {
+                color = autoAssign(username);
+            } else {
+                color = command.getColor();
+            }
+            if (color.equals("observer")) { throw new DataAccessException("Error: Observer cannot resign"); }
             currGameState.setGameFinished(true);
             new dataaccess.GameSQLDAO().updateGameState(command.getGameID(), currGameState);
 
@@ -200,6 +232,9 @@ public class WebSocketHandler {
 
 
         } catch (DataAccessException | SQLException e) {
+            var errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, e.getMessage());
+            Gson gson = new Gson();
+            session.getRemote().sendString(gson.toJson(errorMessage));
             throw new IOException("Error: bad resign request");
         }
     }
